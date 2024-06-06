@@ -1,32 +1,24 @@
-import os
-import fnmatch
-import sys
+import argparse
 import calendar
+import fnmatch
+import os
 
-n = len(sys.argv)
-all_files = []
-script_name = sys.argv[0]
-path = sys.argv[1]
+parser=argparse.ArgumentParser(description="Weather man")
+parser.add_argument("path",help="It's the path where data is placed")
+parser.add_argument("-a",help="This is for the average month report")
+parser.add_argument("-b",help="This is for bonus report")
+parser.add_argument("-c",help="This is for the chart report")
+parser.add_argument("-e",help="This is for the year report")
+args = parser.parse_args()
 
-def given_year(year):
-    year_files = []
+def read_file(year_files):
     result = []
     temp = []
-    min_temp_date = 0
-    max_temp_date = 0
-    max_humid_date = 0
-    
-    for file in os.listdir(path):
-        if (fnmatch.fnmatch(
-            file, '*'+year+'*.txt')):
-            year_files.append(file)
-    
     for i in year_files:
-        file = open(path+i,"r")
+        file = open(args.path + i,"r")
         file_data = file.read()
         temp.append(file_data.splitlines()[1:])
-        
-        
+       
     flattened = []
     for sublist in temp:
         for max in sublist:
@@ -34,6 +26,22 @@ def given_year(year):
             
     for item in flattened:
         result.append(item.split(","))
+        
+    return result
+
+def given_year(year):
+    year_files = []
+    
+    min_temp_date = 0
+    max_temp_date = 0
+    max_humid_date = 0
+    
+    for file in os.listdir(args.path):
+        if (fnmatch.fnmatch(file, '*' + year + '*.txt')):year_files.append(file)
+    
+    result = read_file(year_files)
+    
+    return(result)
     
     max_temp = int(result[0][1])
     min_temp = int(result[0][3])
@@ -54,7 +62,7 @@ def given_year(year):
             continue
         
         low_temp = int(item[3])
-        
+    
         if min_temp > low_temp:
             min_temp_date = item[0]
             min_temp = low_temp
@@ -69,100 +77,57 @@ def given_year(year):
             max_humid_date = item[0]
             max_humid = high_humid
         
-    return [
-        str(max_temp),
-        max_temp_date,
-        str(min_temp),
-        min_temp_date,
-        str(max_humid),
-        max_humid_date
-        ]
+    return [str(max_temp), max_temp_date, str(min_temp), min_temp_date, str(max_humid), max_humid_date]
     
 def given_month(month,year):
     month_files = []
-    result = []
-    temp = []
-    sum_max_temp = int(0)
-    sum_min_temp = int(0)
-    sum_mean_humid = int(0)
+    sum_max_temp = 0
+    sum_min_temp = 0
+    sum_mean_humid = 0
     
-    for file in os.listdir(path):
-        if (fnmatch.fnmatch(
-            file, "*"+year+'_'+month+'*.txt')):
-            month_files.append(file)
+    for file in os.listdir(args.path):
+        if (fnmatch.fnmatch(file, "*" + year + '_' + month + '*.txt')):month_files.append(file)
     
-    for i in month_files:
-        file = open(path+i,"r")
-        file_data = file.read()
-        temp.append(file_data.splitlines()[1:])
-        
-        
-    flattened = []
-    for sublist in temp:
-        for max in sublist:
-            flattened.append(max)
-            
-    for item in flattened:
-        result.append(item.split(","))
+    result=read_file(month_files)
     
     for item in result:
         if(item[1] == ""):
             continue
         
-        sum_max_temp = sum_max_temp+int(item[1])
+        sum_max_temp = sum_max_temp + int(item[1])
     
     for item in result:
         if(item[1] == ""):
             continue
         
-        sum_max_temp = sum_max_temp+int(item[1])
+        sum_max_temp = sum_max_temp + int(item[1])
     
     for item in result:
         if(item[3] == ""):
             continue
         
-        sum_min_temp = sum_min_temp+int(item[3])
+        sum_min_temp = sum_min_temp + int(item[3])
 
     for item in result:
         if(item[8] == ""):
             continue
         
-        sum_mean_humid = sum_mean_humid+int(item[8])
+        sum_mean_humid = sum_mean_humid + int(item[8])
     
-    avg_max_temp = sum_max_temp/len(result)
-    avg_min_temp = sum_min_temp/len(result)
-    avg_mean_humid = sum_mean_humid/len(result)
+    avg_max_temp = sum_max_temp / len(result)
+    avg_min_temp = sum_min_temp / len(result)
+    avg_mean_humid = sum_mean_humid / len(result)
     
-    return [
-        str(int(avg_max_temp)),
-        str(int(avg_min_temp)),
-        str(int(avg_mean_humid))
-        ]
+    return [str(int(avg_max_temp)), str(int(avg_min_temp)), str(int(avg_mean_humid))]
 
 def bar_chart_temp(month,year):
     month_files = []
-    result = []
-    temp = []
     
-    for file in os.listdir(path):
-        if (fnmatch.fnmatch(
-            file, "*"+year+'_'+month+'*.txt')):
+    for file in os.listdir(args.path):
+        if (fnmatch.fnmatch(file, "*" + year + '_' + month + '*.txt')):
             month_files.append(file)
-    
-    for i in month_files:
-        file = open(path+i,"r")
-        file_data = file.read()
-        temp.append(file_data.splitlines()[1:])
             
-    flattened = []
-    for sublist in temp:
-        for max in sublist:
-            flattened.append(max)
-            
-    for item in flattened:
-        result.append(item.split(","))
-        
-    return result
+    return read_file(month_files)
 
 def bar_chart(month,year):
     data = bar_chart_temp(month,year)
@@ -170,10 +135,7 @@ def bar_chart(month,year):
     
     for i in data:
         count = 0
-        print(
-            i[0].split(sep = "-")[2]
-            ,end = ""
-            )
+        print(i[0].split(sep = "-")[2],end = "")
         
         while not i[3] == "" and count < int(i[3]):
             output = "\33[{}m".format(49) + "\33[{}m".format(31) + "+" + "\33[{}m".format(0)
@@ -182,7 +144,7 @@ def bar_chart(month,year):
 
             
         if (not i[1] == ""):
-            print(i[1]+"C")
+            print(f"{i[1]}C")
         else:
             print("")
         count = 0
@@ -194,7 +156,7 @@ def bar_chart(month,year):
             count += 1
  
         if (not i[3] == ""):
-            print(i[3]+"C")
+            print(f"{i[3]}C")
         else:
             print("")
 
@@ -218,76 +180,53 @@ def bar_chart_task5(month,year):
             count += 1
          
         if (not i[3] == ""):
-            print(" "+i[3],end = "C")
+            print(f" {i[3]}",end = "C")
         else:
             print("",end = "")
             
         if (not i[1] == ""):
-            print(" - "+i[1]+"C")
+            print(f" - {i[1]}C")
         else:
             print("")
 
 def month_number_to_short_name(month_number):
     return calendar.month_abbr[month_number]
 
-
-for i in range(2,n,2):
+if(args.e):
+    result = given_year(args.e)
+    print(result)
     
-    flag = sys.argv[i]
-    year_option = sys.argv[i+1]
+    # abbr = month_number_to_short_name(int(result[1].split(sep = "-")[1]))
+    # date = result[1].split(sep = "-")[2]
+    # print("Task 1")
+    # print(f"Highest: {result[0]}C on {abbr} {date}")
+    # abbr = month_number_to_short_name(int(result[3].split(sep = "-")[1]))
+    # date = result[3].split(sep = "-")[2]
+    # print(f"Lowest: {result[2]}C on {abbr} {date}")
+    # abbr = month_number_to_short_name(int(result[5].split(sep = "-")[1]))
+    # date = result[5].split(sep = "-")[2]
+    # print(f"Highest: {result[4]}% on {abbr} {date}")
 
-    if(flag == "-e"):
-        result = given_year(year_option)
-        abbr = month_number_to_short_name(int(result[1].split(sep = "-")[1]))
-        date = result[1].split(sep = "-")[2]
-        print("Task 1")
-        print(
-            "Highest: "+result[0]
-            + "C on "+abbr+" "+date
-            )
-        abbr = month_number_to_short_name(int(result[3].split(sep = "-")[1]))
-        date = result[3].split(sep = "-")[2]
-        print("Lowest: "+ result[2]
-              +"C on "+ abbr+" "+date
-            )
-        abbr = month_number_to_short_name(int(result[5].split(sep = "-")[1]))
-        date = result[5].split(sep = "-")[2]
-        print("Highest: "+ result[4]
-              +"%"+" on "+ abbr+" "+date
-            )
-        
-    if(flag == "-a"):
-        month = year_option.split(sep = "/")[1]
-        year = year_option.split(sep = "/")[0]
-        
-        result = given_month(
-            month_number_to_short_name
-            (int(month)),year
-            )
-        print("Task 2")
-        print("Highest: "+ result[0]+"C")
-        print("Lowest: "+ result[1]+"C")
-        print("Highest: "+ result[2]+"%")
+if(args.a):
+    month = args.a.split(sep = "/")[1]
+    year = args.a.split(sep = "/")[0]
+    
+    result = given_month(month_number_to_short_name(int(month)), year)
+    print("Task 2")
+    print(f"Highest: {result[0]}C")
+    print(f"Lowest: {result[1]}C")
+    print(f"Highest: {result[2]}%")
 
-    if(flag == "-c"):
-        month = year_option.split(sep = "/")[1]
-        year = year_option.split(sep = "/")[0]
-        
-        print("Task 3")
-        print(bar_chart(
-            month_number_to_short_name(int(month)),
-            year
-            ))
+if(args.c):
+    month = args.c.split(sep = "/")[1]
+    year = args.c.split(sep = "/")[0]
+    
+    print("Task 3")
+    print(bar_chart(month_number_to_short_name(int(month)), year))
 
-    if(flag == "-d"):
-        month = year_option.split(sep = "/")[1]
-        year = year_option.split(sep = "/")[0]
-        
-        print("Task 4")
-        print(bar_chart_task5(
-            month_number_to_short_name(int(month)),
-            year
-            ))
-
-
-
+if(args.b):
+    month = args.b.split(sep = "/")[1]
+    year = args.b.split(sep = "/")[0]
+    
+    print("Task 4")
+    print(bar_chart_task5(month_number_to_short_name(int(month)), year))
