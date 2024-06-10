@@ -3,246 +3,248 @@ import calendar
 import fnmatch
 import os
 
-parser=argparse.ArgumentParser(description="Weather man")
-parser.add_argument("path",help="It's the path where data is placed")
-parser.add_argument("-a",help="This is for the average month report")
-parser.add_argument("-b",help="This is for bonus report")
-parser.add_argument("-c",help="This is for the chart report")
-parser.add_argument("-e",help="This is for the year report")
-args = parser.parse_args()
+class WeatherMan:
+    
+    def __init__(self):
+        self.max_temp = float("-inf")
+        self.min_temp = float("inf")
+        self.max_humid = float("-inf")
+        self.min_temp_date = None
+        self.max_temp_date = None
+        self.max_humid_date = None
+        self.avg_high_temp = float("inf")
+        self.avg_low_temp = float("inf")
+        self.avg_mean_humid = float("inf")
+    
+    def month_number_to_short_name(self, month_number):
+        return calendar.month_abbr[month_number]
+    
+    def open_file_year(self, args):
+        year_files = list()
+        
+        for file in os.listdir(args.path):
+            if (fnmatch.fnmatch(file, f"*{args.e}*.txt")):
+                year_files.append(file)
+        
+        return year_files
+    
+    def open_file_month(self, args, month):
+        year = month.split(sep = "/")[0]
+        month_number = month.split(sep = "/")[1]
+        month = self.month_number_to_short_name(int(month_number))
+        month_files = list()
+        
+        for file in os.listdir(args.path):
+            if (fnmatch.fnmatch(file, f"*{year}_{month}*.txt")):
+                month_files.append(file)
+        
+        return month_files
+    
+    def read_file(self, file_name, args):
+        weather_lines_list = list()
+        
+        with open(args.path + file_name, "r") as file:
+            headings = file.readline().strip().split(",")
+            weather_lines = file.readlines()
+            weather_lines_list = self.covert_weather_data_in_required_format(headings, weather_lines)
+        
+        return weather_lines_list        
+    
+    def print_star(self, count, color):
+        
+        for i in range(0, count):
+            print(f"{color}+\033[0m", end = "")
+    
+    def covert_weather_data_in_required_format(self, headings, weather_lines):
+        weather_lines_list = list()
+        weather_line_dict = dict()
+        
+        for line in weather_lines:
+            weather_line_dict = dict()
+            line_list = line.strip().split(sep = ",")
 
-def read_file(year_files):
-    result = []
-    temp = []
-    headings = ""
-    h = []
-    for i in year_files:
-        file = open(args.path + i,"r")
-        file_data = file.read()
-        headings = file_data.splitlines()[0]
-        temp.append(file_data.splitlines()[1:])
+            for index, item in enumerate(line_list):
+                weather_line_dict[headings[index]] = item
+                
+            weather_lines_list.append(weather_line_dict)
+
+        return weather_lines_list
     
-    heading = dict()
-    h = headings.split(sep = ",")
+    def calculate_max_temp_year(self, args, year_files):
+        weather_record = list()
     
-    for index, item in enumerate(h):
-        heading[item] = index
-    
-    flattened = []
-    for sublist in temp:
-        for max in sublist:
-            flattened.append(max)
+        for file_name in year_files:
+            weather_record = self.read_file(file_name, args)
             
-    for item in flattened:
-        result.append(item.split(","))
+            for line in weather_record:
+                if line["Max TemperatureC"]:  # Check if the value is not empty
+                    current_temp = int(line["Max TemperatureC"])
+                    if current_temp > self.max_temp:
+                        self.max_temp = current_temp
+                        self.max_temp_date = line["PKT"]
         
-    return result,heading
-
-def given_year(year):
-    year_files = []
-    
-    min_temp_date = 0
-    max_temp_date = 0
-    max_humid_date = 0
-    
-    for file in os.listdir(args.path):
-        if (fnmatch.fnmatch(file, '*' + year + '*.txt')):year_files.append(file)
-    
-    result,heading = read_file(year_files)
-    
-    max_temp = int(result[0][heading["Max TemperatureC"]])
-    min_temp = int(result[0][heading["Min TemperatureC"]])
-    max_humid = int(result[0][heading["Max Humidity"]])
-    
-    for item in result:
-        if(item[heading["Max TemperatureC"]] == ""):
-            continue
+    def calculate_min_temp_year(self, args, year_files):
+        weather_record = list()
+        
+        for file_name in year_files:
+            weather_record = self.read_file(file_name, args)
             
-        high_temp = int(item[heading["Max TemperatureC"]])
+            for line in weather_record:
+                if line["Min TemperatureC"]:  # Check if the value is not empty
+                    current_temp = int(line["Min TemperatureC"])
+                    if current_temp < self.min_temp:
+                        self.min_temp = current_temp
+                        self.min_temp_date = line["PKT"]
         
-        if (max_temp < high_temp):
-            max_temp_date = item[heading["PKT"]]
-            max_temp = high_temp
+    def calculate_max_humid_year(self, args, year_files):
+        weather_record = list()
+        
+        for file_name in year_files:
+            weather_record = self.read_file(file_name, args)
             
-    for item in result:
-        if(item[heading["Min TemperatureC"]] == ""):
-            continue
+            for line in weather_record:
+                if line["Max Humidity"]:  # Check if the value is not empty
+                    current_humid = int(line["Max Humidity"])
+                    if current_humid > self.max_humid:
+                        self.max_humid = current_humid
+                        self.max_humid_date = line["PKT"]
+           
+    def calculate_avg_max_temp_month(self, args, month_files):
+        weather_record = list()
+        sum_max_temp = 0
+        for file_name in month_files:
+            weather_record = self.read_file(file_name, args)
+            for line in weather_record:
+                if line["Max TemperatureC"]:  # Check if the value is not empty
+                    sum_max_temp = sum_max_temp + int(line["Max TemperatureC"])
+            self.avg_high_temp = sum_max_temp / len(weather_record)
         
-        low_temp = int(item[heading["Min TemperatureC"]])
+        self.avg_high_temp = int(self.avg_high_temp)
     
-        if min_temp > low_temp:
-            min_temp_date = item[heading["PKT"]]
-            min_temp = low_temp
-    
-    for item in result:
-        if(item[heading["Max Humidity"]] == ""):
-            continue
+    def calculate_avg_min_temp_month(self, args, month_files):
+        weather_record = list()
+        sum_min_temp = 0
+        for file_name in month_files:
+            weather_record = self.read_file(file_name, args)
+            for line in weather_record:
+                if line["Min TemperatureC"]:  # Check if the value is not empty
+                    sum_min_temp = sum_min_temp + int(line["Min TemperatureC"])
+            self.avg_low_temp = sum_min_temp / len(weather_record)
         
-        high_humid = int(item[heading["Max Humidity"]])
-        
-        if(max_humid < high_humid):
-            max_humid_date = item[heading["PKT"]]
-            max_humid = high_humid
-        
-    return [str(max_temp), max_temp_date, str(min_temp), min_temp_date, str(max_humid), max_humid_date]
-    
-def given_month(month,year):
-    month_files = []
-    sum_max_temp = 0
-    sum_min_temp = 0
-    sum_mean_humid = 0
-    
-    for file in os.listdir(args.path):
-        if (fnmatch.fnmatch(file, "*" + year + '_' + month + '*.txt')):month_files.append(file)
-    
-    result,heading = read_file(month_files)
-    
-    for item in result:
-        if(item[heading["Max TemperatureC"]] == ""):
-            continue
-        
-        sum_max_temp = sum_max_temp + int(item[heading["Max TemperatureC"]])
-    
-    for item in result:
-        if(item[heading["Min TemperatureC"]] == ""):
-            continue
-        
-        sum_min_temp = sum_min_temp + int(item[heading["Min TemperatureC"]])
+        self.avg_low_temp = int(self.avg_low_temp)
 
-    for item in result:
-        if(item[heading[" Mean Humidity"]] == ""):
-            continue
+    def calculate_avg_mean_humid_month(self, args, month_files):
+        weather_record = list()
+        sum_mean_humid = 0
+        for file_name in month_files:
+            weather_record = self.read_file(file_name, args)
+            for line in weather_record:
+                if line[" Mean Humidity"]:  # Check if the value is not empty
+                    sum_mean_humid = sum_mean_humid + int(line[" Mean Humidity"])
+            self.avg_mean_humid = sum_mean_humid / len(weather_record)
         
-        sum_mean_humid = sum_mean_humid + int(item[heading[" Mean Humidity"]])
+        self.avg_mean_humid = int(self.avg_mean_humid)
     
-    avg_max_temp = sum_max_temp / len(result)
-    avg_min_temp = sum_min_temp / len(result)
-    avg_mean_humid = sum_mean_humid / len(result)
-    
-    return [str(int(avg_max_temp)), str(int(avg_min_temp)), str(int(avg_mean_humid))]
-
-def bar_chart_temp(month,year):
-    month_files = []
-    
-    for file in os.listdir(args.path):
-        if (fnmatch.fnmatch(file, "*" + year + '_' + month + '*.txt')):
-            month_files.append(file)
+    def year_weather_report(self, args):
+        year_files = self.open_file_year(args)
+        self.calculate_max_temp_year(args, year_files)
+        self.calculate_min_temp_year(args, year_files)
+        self.calculate_max_humid_year(args, year_files)
+        
+        print("Yearly weather report", end = "\n\n")
+        # print for high temp
+        month_number = int(self.max_temp_date.split(sep = "-")[1])
+        date = self.max_temp_date.split(sep = "-")[2]
+        print(f"Highest: {self.max_temp}C on {self.month_number_to_short_name(month_number)} {date}")
+        
+        # print for min temp
+        month_number = int(self.min_temp_date.split(sep = "-")[1])
+        date = self.min_temp_date.split(sep = "-")[2]
+        print(f"Lowest: {self.min_temp}C on {self.month_number_to_short_name(month_number)} {date}")
+        
+        # print for max humid
+        month_number = int(self.max_humid_date.split(sep = "-")[1])
+        date = self.max_humid_date.split(sep = "-")[2]
+        print(f"Humidity: {self.max_humid}% on {self.month_number_to_short_name(month_number)} {date}", end = "\n\n")
+        
+    def month_weather_report(self, args):
+        month_files = self.open_file_month(args, args.a)
+        self.calculate_avg_max_temp_month(args, month_files)
+        self.calculate_avg_min_temp_month(args, month_files)
+        self.calculate_avg_mean_humid_month(args, month_files)
+        
+        print("Monthly Average Weather Report", end = "\n\n")
+        # print for avg max temp
+        print(f"Highest Average: {self.avg_high_temp}C")
+        
+        # print for avg min temp
+        print(f"Lowest Average: {self.avg_low_temp}C")
+        
+        # print for avg mean humid
+        print(f"Average Mean Humidity: {self.avg_mean_humid}C", end = "\n\n")
+        
+    def bar_chart(self, args):
+        weather_record = list()
+        month_files = self.open_file_month(args, args.c)
+        
+        for file_name in month_files:
+            weather_record = self.read_file(file_name, args)
+            print("Monthly Temperature Chart", end = "\n\n")
             
-    return read_file(month_files)
-
-def bar_chart(month,year):
-    result, heading = bar_chart_temp(month,year)
-    count = 0
-
-    for i in result:
-        count = 0
-        date = i[heading["PKT"]].split("-")[2]
-        min_temp = i[heading["Min TemperatureC"]]
-        max_temp = i[heading["Max TemperatureC"]]
-        
-        print(date, end="")
-
-        if min_temp != "":
-            min_temp = int(min_temp)
-            while count < min_temp:
-                output = "\33[49m\33[31m+\33[0m"
-                print(output, end="")
-                count += 1
-
-            print(f" {min_temp}C")
-        else:
-            print("")
-
-        count = 0
-        print(date, end="")
-
-        if max_temp != "":
-            max_temp = int(max_temp)
-            while count < max_temp:
-                output = "\33[49m\33[96m+\33[0m"
-                print(output, end="")
-                count += 1
-
-            print(f" {max_temp}C")
-        else:
-            print("")
-
-
-
-def bar_chart_task5(month,year):
-    result, heading = bar_chart_temp(month,year)
-    count = 0
+            for line in weather_record:
+                date = line["PKT"].split(sep = "-")[2]
+                if line["Max TemperatureC"]:
+                    print(date, end = "    ")
+                    self.print_star(int(line["Max TemperatureC"]), "\033[91m")
+                    print(f"{line['Max TemperatureC']}C")
+                if line["Min TemperatureC"]:
+                    print(date, end = "    ")
+                    self.print_star(int(line["Min TemperatureC"]), "\033[94m")
+                    print(f"{line['Min TemperatureC']}C")
+                
+        print("", end = "\n\n")
     
-    for i in result:
-        count = 0
-        date = i[heading["PKT"]].split("-")[2]
-        min_temp = i[heading["Min TemperatureC"]]
-        max_temp = i[heading["Max TemperatureC"]]
+    def bonus_task(self, args):
+        weather_record = list()
+        month_files = self.open_file_month(args, args.b)
         
-        print(date, end="")
-        
-        # Print bar chart for Min TemperatureC
-        while not min_temp == "" and count < int(min_temp):
-            output = "\33[49m\33[96m+\33[0m"
-            print(output, end="")
-            count += 1
-
-        count = 0
-        # Print bar chart for Max TemperatureC
-        while not max_temp == "" and count < int(max_temp):
-            output = "\33[49m\33[31m+\33[0m"
-            print(output, end="")
-            count += 1
-        
-        # Print Max TempatureC
-        if not max_temp == "":
-            print(f" {max_temp}C", end="")
-        else:
-            print("", end="")
+        for file_name in month_files:
+            weather_record = self.read_file(file_name, args)
+            print("Bonus Task", end = "\n\n")
             
-        # Print Min TempatureC
-        if not min_temp == "":
-            print(f" - {min_temp}C")
-        else:
-            print("")
+            for line in weather_record:
+                if line["Min TemperatureC"] or line["Max TemperatureC"]:
+                    date = line["PKT"].split(sep = "-")[2]
+                    print(date, end = "    ")
+                    if line["Min TemperatureC"]:
+                        self.print_star(int(line["Min TemperatureC"]), "\033[94m")
+                    if line["Max TemperatureC"]:
+                        self.print_star(int(line["Max TemperatureC"]), "\033[91m")
+                    print(f"{line['Min TemperatureC']}C - {line['Max TemperatureC']}C")
+        
+        print("", end = "\n\n")
 
-def month_number_to_short_name(month_number):
-    return calendar.month_abbr[month_number]
-
-if(args.e):
-    result = given_year(args.e)
+def main():
+    test = WeatherMan()
     
-    abbr = month_number_to_short_name(int(result[1].split(sep = "-")[1]))
-    date = result[1].split(sep = "-")[2]
-    print("Task 1")
-    print(f"Highest: {result[0]}C on {abbr} {date}")
-    abbr = month_number_to_short_name(int(result[3].split(sep = "-")[1]))
-    date = result[3].split(sep = "-")[2]
-    print(f"Lowest: {result[2]}C on {abbr} {date}")
-    abbr = month_number_to_short_name(int(result[5].split(sep = "-")[1]))
-    date = result[5].split(sep = "-")[2]
-    print(f"Highest: {result[4]}% on {abbr} {date}")
-
-if(args.a):
-    month = args.a.split(sep = "/")[1]
-    year = args.a.split(sep = "/")[0]
+    parser=argparse.ArgumentParser(description = "Weather man")
+    parser.add_argument("path", help = "It's the path where data is placed")
+    parser.add_argument("-a", help = "This is for the average month report")
+    parser.add_argument("-b", help = "This is for bonus report")
+    parser.add_argument("-c", help = "This is for the chart report")
+    parser.add_argument("-e", help = "This is for the year report")
+    args = parser.parse_args()
     
-    result = given_month(month_number_to_short_name(int(month)), year)
-    print("Task 2")
-    print(f"Highest: {result[0]}C")
-    print(f"Lowest: {result[1]}C")
-    print(f"Highest: {result[2]}%")
-
-if(args.c):
-    month = args.c.split(sep = "/")[1]
-    year = args.c.split(sep = "/")[0]
+    if(args.e):
+        test.year_weather_report(args)
     
-    print("Task 3")
-    print(bar_chart(month_number_to_short_name(int(month)), year))
-
-if(args.b):
-    month = args.b.split(sep = "/")[1]
-    year = args.b.split(sep = "/")[0]
+    if(args.a):
+        test.month_weather_report(args)
+        
+    if(args.c):
+        test.bar_chart(args)
     
-    print("Task 4")
-    print(bar_chart_task5(month_number_to_short_name(int(month)), year))
+    if(args.b):
+        test.bonus_task(args)
+    
+main()
