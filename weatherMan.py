@@ -24,10 +24,6 @@ class WeatherReportGenerator:
         if year == None or month == None:
             return []
         
-        # year = month.split(sep = "/")[0]
-        # month_number = month.split(sep = "/")[1]
-        # month = calendar.month_abbr[int(month_number)]
-        
         month_files = [file for file in os.listdir(args.path)
                         if fnmatch.fnmatch(file, f"*{year}_{month}*.txt")]
 
@@ -38,17 +34,17 @@ class WeatherReportGenerator:
         with open(args.path + file_name, "r") as file:
             headings = file.readline().strip().split(",")
             weather_lines = file.readlines()
-            weather_lines_record = self.covert_weather_data_in_required_format(headings, weather_lines)
+            weather_lines_record, date = self.covert_weather_data_in_required_format(headings, weather_lines)
         
-        return weather_lines_record        
+        return weather_lines_record, date        
     
     def calculate_average(self, weather_record, key):
         sum_of_values = 0
         for line in weather_record:
             value = line.get(key)
-    
             if value:
                 sum_of_values = sum_of_values + int(line[key])
+                
         return int(sum_of_values / len(weather_record))
     
     def print_star(self, count, color):
@@ -57,62 +53,65 @@ class WeatherReportGenerator:
             print(f"{color}+\033[0m", end = "")
     
     def covert_weather_data_in_required_format(self, headings, weather_lines):
+        date = "PKT" if "PKT" in headings else "PKST"
         weather_lines_record = [{headings[index] : item for index, item in enumerate(line.strip().split(sep = ","))} for line in weather_lines]
-        return weather_lines_record
+        
+        return weather_lines_record, date
     
     def calculate_max_temp_year(self, args, year_files):
         max_temp = float("-inf")
-        max_temp_date =None
+        max_temp_date = None
+        
         for file_name in year_files:
-            weather_record = self.read_file(file_name, args)
+            weather_record, date = self.read_file(file_name, args)
             
             for line in weather_record:
                 max_temperature_value = line.get("Max TemperatureC")
-                
                 if max_temperature_value:
                     current_temp = int(line["Max TemperatureC"])
                     if current_temp > max_temp:
                         max_temp = current_temp
-                        max_temp_date = line["PKT"]
+                        max_temp_date = line[date]
         
         return max_temp, max_temp_date
         
     def calculate_min_temp_year(self, args, year_files):
         min_temp = float("inf")
         min_temp_date = None
+        
         for file_name in year_files:
-            weather_record = self.read_file(file_name, args)
+            weather_record, date = self.read_file(file_name, args)
             
             for line in weather_record:
                 min_temperature_value = line.get("Min TemperatureC")
-                
                 if min_temperature_value:
                     current_temp = int(line["Min TemperatureC"])
                     
                     if current_temp < min_temp:
                         min_temp = current_temp
-                        min_temp_date = line["PKT"]
+                        min_temp_date = line[date]
         
         return min_temp, min_temp_date
         
     def calculate_max_humid_year(self, args, year_files):
         max_humid = float("-inf")
         max_humid_date = None
+        
         for file_name in year_files:
-            weather_record = self.read_file(file_name, args)
+            weather_record, date = self.read_file(file_name, args)
             
             for line in weather_record:
                 max_humidity_value = line.get("Max Humidity")
-                
                 if max_humidity_value:
                     current_humid = int(max_humidity_value)
                     if current_humid > max_humid:
                         max_humid = current_humid
-                        max_humid_date = line.get("PKT")
+                        max_humid_date = line[date]
         
         return max_humid, max_humid_date
 
     def calculate_avg_max_temp_month(self, args, month_files):
+        
         for file_name in month_files:
             weather_record = self.read_file(file_name, args)
             
@@ -121,6 +120,7 @@ class WeatherReportGenerator:
         return avg_high_temp
     
     def calculate_avg_min_temp_month(self, args, month_files):
+        
         for file_name in month_files:
             weather_record = self.read_file(file_name, args)
             
@@ -129,6 +129,7 @@ class WeatherReportGenerator:
         return avg_low_temp
 
     def calculate_avg_mean_humid_month(self, args, month_files):
+        
         for file_name in month_files:
             weather_record = self.read_file(file_name, args)
             
