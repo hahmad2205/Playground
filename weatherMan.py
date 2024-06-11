@@ -29,6 +29,7 @@ class WeatherReportGenerator:
     def filter_filename_by_month(self, user_input, year, month_abbr):
 
         for weather_file in os.listdir(user_input.path):
+            
             if fnmatch.fnmatch(weather_file, f"*{year}_{month_abbr}*.txt"):
                 return weather_file
     
@@ -38,7 +39,6 @@ class WeatherReportGenerator:
             headings = weather_file.readline().strip().split(",")
             weather_lines = weather_file.readlines()
             weather_lines_record, date = self.covert_weather_data_in_required_format(headings, weather_lines)
-        
         return weather_lines_record, date
     
     def calculate_average(self, weather_record, key):
@@ -52,19 +52,16 @@ class WeatherReportGenerator:
         
             if value:
                 sum_of_values = sum_of_values + int(weather_line[key])
-                
         return int(sum_of_values / len(weather_record))
     
     def covert_weather_data_in_required_format(self, headings, weather_lines):
         date_abbr = "PKT" if "PKT" in headings else "PKST"
         weather_lines_record = [{headings[index] : item for index, item in enumerate(line.strip().split(sep = ","))} for line in weather_lines]
-        
         return weather_lines_record, date_abbr
     
     def generate_weather_record_for_month(self,user_input, key):
         year, month_abbr = self.parse_arguments_for_month(key)
         month_files = self.filter_filename_by_month(user_input, year, month_abbr)
-        
         return self.read_file(month_files, user_input)
                
     def calculate_max_temperature_year(self, weather_record, date_abbr, max_temperature, max_temperature_date):
@@ -75,7 +72,6 @@ class WeatherReportGenerator:
                 current_temperature = int(max_temperature_value)
                 max_temperature = max(max_temperature, current_temperature)
                 max_temperature_date = weather_line[date_abbr] if current_temperature == int(max_temperature) else max_temperature_date
-                    
         return max_temperature, max_temperature_date
         
     def calculate_min_temperature_year(self, weather_record, date_abbr, min_temperature, min_temperature_date):
@@ -86,7 +82,6 @@ class WeatherReportGenerator:
                 current_temperature = int(min_temperature_value)
                 min_temperature = min(current_temperature, min_temperature)
                 min_temperature_date = weather_line[date_abbr] if current_temperature == int(min_temperature) else min_temperature_date
-    
         return min_temperature, min_temperature_date
         
     def calculate_max_humid_year(self, weather_record, date_abbr, max_humid, max_humid_date):
@@ -97,18 +92,15 @@ class WeatherReportGenerator:
                 current_humid = int(max_humidity_value)
                 max_humid = max(current_humid, max_humid)
                 max_humid_date = weather_line[date_abbr] if current_humid == int(max_humid) else max_humid_date
-                        
         return max_humid, max_humid_date
 
     def calculate_avg_max_temperature_month(self, weather_record):
         return self.calculate_average(weather_record, "Max TemperatureC")
     
     def calculate_avg_min_temperature_month(self,weather_record):        
-        
         return self.calculate_average(weather_record, "Min TemperatureC")
         
     def calculate_avg_mean_humid_month(self, weather_record):
-            
         return self.calculate_average(weather_record, " Mean Humidity")
     
     def generate_year_weather_report(self, user_input):
@@ -118,7 +110,6 @@ class WeatherReportGenerator:
         max_temperature_date = None
         min_temperature_date = None
         max_humid_date = None
-        
         year_files = self.filter_filename_by_year(user_input)
         
         for file_name in year_files:
@@ -132,14 +123,12 @@ class WeatherReportGenerator:
         
     def generate_month_weather_report(self, user_input):
         weather_record, _ = self.generate_weather_record_for_month(user_input, user_input.a)
-        
         avg_high_temperature = self.calculate_avg_max_temperature_month(weather_record)
         avg_low_temperature = self.calculate_avg_min_temperature_month(weather_record)
         avg_mean_humid = self.calculate_avg_mean_humid_month(weather_record)
         self.print_month_weather_report(avg_high_temperature, avg_low_temperature, avg_mean_humid)
         
     def generate_month_temperature_bar_chart(self, user_input):
-        
         weather_record, date_abbr = self.generate_weather_record_for_month(user_input, user_input.c)    
         self.print_month_temperature_bar_chart(weather_record, date_abbr)
     
@@ -159,6 +148,7 @@ class WeatherReportGenerator:
         print(f"Average Mean Humidity: {avg_mean_humid}C", end = "\n\n")
     
     def print_month_temperature_bar_chart(self, weather_record, date_abbr):
+        
         for line in weather_record:
             date = line[date_abbr].split(sep = "-")[2]
             
@@ -173,6 +163,7 @@ class WeatherReportGenerator:
                 print(f"{line['Min TemperatureC']}C")
     
     def print_month_temperature_bar_chart_bonus_task(self, weather_record, date_abbr):
+        
         for line in weather_record:
             
             if line["Min TemperatureC"] or line["Max TemperatureC"]:
@@ -187,6 +178,7 @@ class WeatherReportGenerator:
                 print(f"{line['Min TemperatureC']}C - {line['Max TemperatureC']}C")
     
     def print_year_weather_report(self, max_temperature, max_temperature_date, min_temperature, min_temperature_date, max_humid, max_humid_date):
+        
         if max_temperature != "" and max_temperature_date != None:
             month_number = int(max_temperature_date.split(sep = "-")[1])
             date = max_temperature_date.split(sep = "-")[2]
