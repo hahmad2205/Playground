@@ -67,61 +67,37 @@ class WeatherReportGenerator:
         
         return self.read_file(month_files, user_input)
                
-    def calculate_max_temperature_year(self, user_input, year_files):
-        max_temperature = float("-inf")
-        max_temperature_date = None
-        
-        for file_name in year_files:
-            weather_record, date_abbr = self.read_file(file_name, user_input)
+    def calculate_max_temperature_year(self, weather_record, date_abbr, max_temperature, max_temperature_date):
+        for weather_line in weather_record:
+            max_temperature_value = weather_line.get("Max TemperatureC")
             
-            for weather_line in weather_record:
-                max_temperature_value = weather_line.get("Max TemperatureC")
-                
-                if max_temperature_value:
-                    current_temperature = int(max_temperature_value)
-                    max_temperature = max(max_temperature, current_temperature)
-                    max_temperature_date = weather_line[date_abbr] if current_temperature == int(max_temperature) else max_temperature_date
+            if max_temperature_value:
+                current_temperature = int(max_temperature_value)
+                max_temperature = max(max_temperature, current_temperature)
+                max_temperature_date = weather_line[date_abbr] if current_temperature == int(max_temperature) else max_temperature_date
                     
         return max_temperature, max_temperature_date
         
-    def calculate_min_temperature_year(self, user_input, year_files):
-        min_temperature = float("inf")
-        min_temperature_date = None
+    def calculate_min_temperature_year(self, weather_record, date_abbr, min_temperature, min_temperature_date):
+        for weather_line in weather_record:
+            min_temperature_value = weather_line.get("Min TemperatureC")
             
-        for file_name in year_files:
-            weather_record, date_abbr = self.read_file(file_name, user_input)
-            
-            if not len(weather_record):
-                return 0, None
-            
-            for weather_line in weather_record:
-                min_temperature_value = weather_line.get("Min TemperatureC")
-                
-                if min_temperature_value:
-                    current_temperature = int(min_temperature_value)
-                    min_temperature = min(current_temperature, min_temperature)
-                    min_temperature_date = weather_line[date_abbr] if current_temperature == int(min_temperature) else min_temperature_date
-        
+            if min_temperature_value:
+                current_temperature = int(min_temperature_value)
+                min_temperature = min(current_temperature, min_temperature)
+                min_temperature_date = weather_line[date_abbr] if current_temperature == int(min_temperature) else min_temperature_date
+    
         return min_temperature, min_temperature_date
         
-    def calculate_max_humid_year(self, user_input, year_files):
-        max_humid = float("-inf")
-        max_humid_date = None
+    def calculate_max_humid_year(self, weather_record, date_abbr, max_humid, max_humid_date):
+        for weather_line in weather_record:
+            max_humidity_value = weather_line.get("Max Humidity")
             
-        for file_name in year_files:
-            weather_record, date_abbr = self.read_file(file_name, user_input)
-            
-            if not len(weather_record):
-                return 0, None
-            
-            for weather_line in weather_record:
-                max_humidity_value = weather_line.get("Max Humidity")
-                
-                if max_humidity_value:
-                    current_humid = int(max_humidity_value)
-                    max_humid = max(current_humid, max_humid)
-                    max_humid_date = weather_line[date_abbr] if current_humid == int(max_humid) else max_humid_date
-                           
+            if max_humidity_value:
+                current_humid = int(max_humidity_value)
+                max_humid = max(current_humid, max_humid)
+                max_humid_date = weather_line[date_abbr] if current_humid == int(max_humid) else max_humid_date
+                        
         return max_humid, max_humid_date
 
     def calculate_avg_max_temperature_month(self, weather_record):
@@ -136,11 +112,22 @@ class WeatherReportGenerator:
         return self.calculate_average(weather_record, " Mean Humidity")
     
     def generate_year_weather_report(self, user_input):
+        max_temperature = float("-inf")
+        min_temperature = float("inf")
+        max_humid = float("-inf")
+        max_temperature_date = None
+        min_temperature_date = None
+        max_humid_date = None
+        
         year_files = self.filter_filename_by_year(user_input)
         
-        max_temperature, max_temperature_date = self.calculate_max_temperature_year(user_input, year_files)
-        min_temperature, min_temperature_date = self.calculate_min_temperature_year(user_input, year_files)
-        max_humid, max_humid_date = self.calculate_max_humid_year(user_input, year_files)
+        for file_name in year_files:
+            weather_record, date_abbr = self.read_file(file_name, user_input)
+            
+            max_temperature, max_temperature_date = self.calculate_max_temperature_year(weather_record, date_abbr, max_temperature, max_temperature_date)
+            min_temperature, min_temperature_date = self.calculate_min_temperature_year(weather_record, date_abbr, min_temperature, min_temperature_date)
+            max_humid, max_humid_date = self.calculate_max_humid_year(weather_record, date_abbr, max_humid, max_humid_date)
+            
         self.print_year_weather_report(max_temperature, max_temperature_date, min_temperature, min_temperature_date, max_humid, max_humid_date)
         
     def generate_month_weather_report(self, user_input):
