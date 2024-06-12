@@ -8,9 +8,9 @@ class WeatherReportGenerator:
     
     def filter_filename_by_year(self, user_input):
         return [
-                    weather_file for weather_file in os.listdir(user_input.path)
-                    if fnmatch.fnmatch(weather_file, f"*{user_input.e}*.txt")
-                ]
+            weather_file for weather_file in os.listdir(user_input.path)
+            if fnmatch.fnmatch(weather_file, f"*{user_input.e}*.txt")
+        ]
 
     def parse_arguments_for_month(self, month):
         year_pattern = r'^\d{4}'
@@ -179,17 +179,17 @@ class WeatherReportGenerator:
     
     def print_year_weather_report(self, max_temperature, max_temperature_date, min_temperature, min_temperature_date, max_humid, max_humid_date):
         
-        if max_temperature != "" and max_temperature_date != None:
+        if max_temperature != "" and max_temperature_date is not None:
             month_number = int(max_temperature_date.split(sep = "-")[1])
             date = max_temperature_date.split(sep = "-")[2]
             print(f"Highest: {max_temperature}C on {calendar.month_abbr[month_number]} {date}")
         
-        if min_temperature != "" and min_temperature_date != None:
+        if min_temperature != "" and min_temperature_date is not None:
             month_number = int(min_temperature_date.split(sep = "-")[1])
             date = min_temperature_date.split(sep = "-")[2]
             print(f"Lowest: {min_temperature}C on {calendar.month_abbr[month_number]} {date}")
         
-        if max_humid != "" and max_humid_date != None:
+        if max_humid != "" and max_humid_date is not None:
             month_number = int(max_humid_date.split(sep = "-")[1])
             date = max_humid_date.split(sep = "-")[2]
             print(f"Humidity: {max_humid}% on {calendar.month_abbr[month_number]} {date}", end = "\n\n")    
