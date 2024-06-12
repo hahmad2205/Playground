@@ -1,5 +1,6 @@
 import argparse
 import calendar
+import datetime
 import fnmatch
 import os
 import re
@@ -138,7 +139,7 @@ class WeatherReportGenerator:
     
     def print_star(self, plus_count, color):
         
-        for i in range(0, plus_count):
+        for _ in range(0, plus_count):
             print(f"{color}+\033[0m", end = "")
     
     def print_month_weather_report(self, avg_high_temperature, avg_low_temperature, avg_mean_humid):
@@ -150,7 +151,8 @@ class WeatherReportGenerator:
     def print_month_temperature_bar_chart(self, weather_record, date_abbr):
         
         for line in weather_record:
-            date = line[date_abbr].split(sep = "-")[2]
+            date = datetime.datetime.strptime(line[date_abbr], "%Y-%m-%d")
+            date = date.day
             
             if line["Max TemperatureC"]:
                 print(date, end = "    ")
@@ -167,7 +169,8 @@ class WeatherReportGenerator:
         for line in weather_record:
             
             if line["Min TemperatureC"] or line["Max TemperatureC"]:
-                date = line[date_abbr].split(sep = "-")[2]
+                date = datetime.datetime.strptime(line[date_abbr], "%Y-%m-%d")
+                date = date.day
                 print(date, end = "    ")
                 
                 if line["Min TemperatureC"]:
@@ -179,20 +182,17 @@ class WeatherReportGenerator:
     
     def print_year_weather_report(self, max_temperature, max_temperature_date, min_temperature, min_temperature_date, max_humid, max_humid_date):
         
-        if max_temperature != "" and max_temperature_date is not None:
-            month_number = int(max_temperature_date.split(sep = "-")[1])
-            date = max_temperature_date.split(sep = "-")[2]
-            print(f"Highest: {max_temperature}C on {calendar.month_abbr[month_number]} {date}")
+        if max_temperature != "" and max_temperature_date:
+            date = datetime.datetime.strptime(max_temperature_date, "%Y-%m-%d")
+            print(f"Highest: {max_temperature}C on {calendar.month_abbr[date.month]} {date.day}")
         
-        if min_temperature != "" and min_temperature_date is not None:
-            month_number = int(min_temperature_date.split(sep = "-")[1])
-            date = min_temperature_date.split(sep = "-")[2]
-            print(f"Lowest: {min_temperature}C on {calendar.month_abbr[month_number]} {date}")
+        if min_temperature != "" and min_temperature_date:
+            date = datetime.datetime.strptime(min_temperature_date, "%Y-%m-%d")
+            print(f"Lowest: {min_temperature}C on {calendar.month_abbr[date.month]} {date.day}")
         
-        if max_humid != "" and max_humid_date is not None:
-            month_number = int(max_humid_date.split(sep = "-")[1])
-            date = max_humid_date.split(sep = "-")[2]
-            print(f"Humidity: {max_humid}% on {calendar.month_abbr[month_number]} {date}", end = "\n\n")    
+        if max_humid != "" and max_humid_date:
+            date = datetime.datetime.strptime(max_humid_date, "%Y-%m-%d")
+            print(f"Humidity: {max_humid}% on {calendar.month_abbr[date.month]} {date.day}", end = "\n\n")    
     
 def main():
     
