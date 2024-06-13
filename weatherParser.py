@@ -17,6 +17,6 @@ class WeatherDataParser:
         
         if matched_year:
             year = matched_year.group()
-            return year
+            return year, None
         
         return None
