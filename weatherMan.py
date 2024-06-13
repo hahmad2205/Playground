@@ -29,7 +29,8 @@ class WeatherMan:
         
         if user_input.e:
             valid_date = self.weather_parser.parse_arguments_for_date(user_input.e)
-            if valid_date:
+            year, month_abbr = valid_date
+            if year and not month_abbr:
                 weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
                 self.weather_report_generator.generate_year_weather_report(weather_record)
             else:
@@ -37,7 +38,8 @@ class WeatherMan:
         
         if user_input.a:
             valid_date = self.weather_parser.parse_arguments_for_date(user_input.a)
-            if valid_date:
+            year, month_abbr = valid_date
+            if year and month_abbr:
                 weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
                 self.weather_report_generator.generate_month_weather_report(weather_record)
             else:
@@ -45,7 +47,8 @@ class WeatherMan:
             
         if user_input.c:
             valid_date = self.weather_parser.parse_arguments_for_date(user_input.c)
-            if valid_date:
+            year, month_abbr = valid_date
+            if year and month_abbr:
                 weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
                 self.weather_report_generator.generate_month_temperature_bar_chart(weather_record)
             else:
@@ -53,8 +56,8 @@ class WeatherMan:
         
         if user_input.b:
             valid_date = self.weather_parser.parse_arguments_for_date(user_input.b)
-            
-            if valid_date:
+            year, month_abbr = valid_date
+            if year and month_abbr:
                 weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
                 self.weather_report_generator.generate_month_temperature_bar_chart_bonus_task(weather_record)
             else:
