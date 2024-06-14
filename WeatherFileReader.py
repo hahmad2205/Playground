@@ -33,5 +33,3 @@ class WeatherFileReader:
             }
             for record in weather_records_per_file
         ]
-
-        
