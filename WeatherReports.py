@@ -30,26 +30,26 @@ class WeatherReportGenerator:
         self.print_year_weather_report(calculation_results)
             
     def generate_month_weather_report(self, weather_records):
-        avg_high_temperature = (
+        average_high_temperature = (
             self.weather_calculation.calculate_average_temperature(
                 weather_records, "Max TemperatureC"
             )
         )
-        avg_low_temperature = (
+        average_low_temperature = (
             self.weather_calculation.calculate_average_temperature(
                 weather_records, "Min TemperatureC"
             )
         )
-        avg_mean_humid = (
+        average_mean_humid = (
             self.weather_calculation.calculate_average_temperature(
                 weather_records, " Mean Humidity"
             )
         )
         
         calculation_results = {
-                        "avg_high_temperature" : avg_high_temperature,
-                        "avg_low_temperature" : avg_low_temperature,
-                        "avg_mean_humid" : avg_mean_humid
+                        "average_high_temperature" : average_high_temperature,
+                        "average_low_temperature" : average_low_temperature,
+                        "average_mean_humid" : average_mean_humid
         }
         
         self.print_month_weather_report(calculation_results)
@@ -95,9 +95,9 @@ class WeatherReportGenerator:
     
     def print_month_weather_report(self, calculation_results):
         print("Monthly Average Weather Report", end = "\n\n")
-        print(f"Highest Average: {calculation_results.get('avg_high_temperature')}C")       
-        print(f"Lowest Average: {calculation_results.get('avg_low_temperature')}C")
-        print(f"Average Mean Humidity: {calculation_results.get('avg_mean_humid')}C", end = "\n\n")
+        print(f"Highest Average: {calculation_results.get('average_high_temperature')}C")       
+        print(f"Lowest Average: {calculation_results.get('average_low_temperature')}C")
+        print(f"Average Mean Humidity: {calculation_results.get('average_mean_humid')}C", end = "\n\n")
      
     def print_year_weather_report(self, calculation_results):
         print("Yearly Weather Report", end="\n\n")
