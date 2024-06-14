@@ -1,8 +1,8 @@
 import argparse
 
-from weatherParser import WeatherDataParser
-from weatherFileReader import WeatherFileReader
-from weatherReports import WeatherReportGenerator
+from Playground.WeatherParser import WeatherDataParser
+from Playground.WeatherFileReader import WeatherFileReader
+from Playground.WeatherReports import WeatherReportGenerator
 
 class WeatherMan:
     weather_file_reader = WeatherFileReader()

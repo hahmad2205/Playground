@@ -1,7 +1,7 @@
 import calendar
 import datetime
 
-from weatherCalculation import WeatherCalculation
+from Playground.WeatherCalculation import WeatherCalculation
 
 class WeatherReportGenerator:
     weather_calculation = WeatherCalculation()
