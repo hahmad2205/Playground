@@ -12,6 +12,7 @@ class WeatherMan:
     def handle_user_input_for_month_and_year(self, path, valid_date):
         year, month_abbr = valid_date
         month_files = self.weather_file_reader.filter_filename_by_year_and_month(path, year, month_abbr)
+        
         return self.weather_file_reader.read_file(month_files, path)
         
     def main_execute(self):

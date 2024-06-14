@@ -25,6 +25,7 @@ class WeatherCalculation:
         for record in weather_records:
             temperature = record.get(key)
             sum_of_temperatures = sum_of_temperatures + int(record[key]) if temperature else 0
+        
         return round(sum_of_temperatures / len(weather_records))
    
     def calculate_min_temperature_year(self, weather_records):

@@ -85,6 +85,7 @@ class WeatherReportGenerator:
     def get_date_for_bar_chart(self, reading):
         date_abbr = reading["PKT"] if reading.get("PKT") else reading["PKST"]
         date = datetime.datetime.strptime(date_abbr, "%Y-%m-%d")
+        
         return date.day
         
     def print_star(self, plus_count, color):

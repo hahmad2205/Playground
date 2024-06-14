@@ -25,6 +25,7 @@ class WeatherFileReader:
         return weather_records
     
     def covert_weather_data_in_required_format(self, weather_headings, weather_records_per_file):
+        
         return [
             {
                 weather_headings[index]: item
