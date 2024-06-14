@@ -10,8 +10,6 @@ class WeatherDataParser:
         matched_month_number = re.search(month_pattern, date)
         
         if matched_year and matched_month_number:    
-            # year = matched_year.group()
-            # month_abbr = calendar.month_abbr[int(matched_month_number.group()[1:])]
             year, month = date.split(sep = "/")
             month_abbr = calendar.month_abbr[int(month)] if month else None
             
