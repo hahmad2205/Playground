@@ -19,7 +19,7 @@ class WeatherCalculation:
         
         return max_weather_reading, max_weather_date
     
-    def calculate_average(self, weather_records, key):
+    def calculate_average_temperature(self, weather_records, key):
         sum_of_temperatures = 0
         
         for record in weather_records:
@@ -28,7 +28,7 @@ class WeatherCalculation:
         
         return round(sum_of_temperatures / len(weather_records))
    
-    def calculate_min_temperature_year(self, weather_records):
+    def calculate_min_temperature_reading(self, weather_records):
         min_temperatures = []
         for record in weather_records:
             min_temperature_value = record.get("Min TemperatureC")

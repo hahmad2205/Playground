@@ -1,24 +1,24 @@
 import argparse
 
-from Playground.WeatherParser import WeatherDataParser
-from Playground.WeatherFileReader import WeatherFileReader
-from Playground.WeatherReports import WeatherReportGenerator
+from WeatherParser import WeatherDataParser
+from WeatherFileReader import WeatherFileReader
+from WeatherReports import WeatherReportGenerator
 
 class WeatherMan:
     weather_file_reader = WeatherFileReader()
     weather_parser = WeatherDataParser()
     weather_report_generator = WeatherReportGenerator()
     
-    def handle_user_input_for_month_and_year(self, path, valid_date):
+    def handle_user_input_for_month_and_year(self, files_path, valid_date):
         year, month_abbr = valid_date
-        month_files = self.weather_file_reader.filter_filename_by_year_and_month(path, year, month_abbr)
+        weather_files = self.weather_file_reader.filter_filename_by_year_and_month(files_path, year, month_abbr)
         
-        return self.weather_file_reader.read_file(month_files, path)
+        return self.weather_file_reader.read_file(weather_files, files_path)
         
     def main_execute(self):
         parser = argparse.ArgumentParser(description="Weather man")
     
-        parser.add_argument("path", help="It's the path where data is placed")
+        parser.add_argument("files_path", help="It's the files_path where data is placed")
         parser.add_argument("-a", help="This is for the average month report")
         parser.add_argument("-b", help="This is for bonus report")
         parser.add_argument("-c", help="This is for the chart report")
@@ -31,10 +31,10 @@ class WeatherMan:
             year, month_abbr = valid_date
             
             if year and not month_abbr:
-                weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
+                weather_records = self.handle_user_input_for_month_and_year(user_input.files_path, valid_date)
                 
-                if len(weather_record):
-                    self.weather_report_generator.generate_year_weather_report(weather_record)
+                if len(weather_records):
+                    self.weather_report_generator.generate_year_weather_report(weather_records)
             else:
                 print("Error: Not a valid year")
         
@@ -43,10 +43,10 @@ class WeatherMan:
             year, month_abbr = valid_date
             
             if year and month_abbr:
-                weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
+                weather_records = self.handle_user_input_for_month_and_year(user_input.files_path, valid_date)
                 
-                if len(weather_record):
-                    self.weather_report_generator.generate_month_weather_report(weather_record)
+                if len(weather_records):
+                    self.weather_report_generator.generate_month_weather_report(weather_records)
             else:
                 print("Error: Not a valid month")
             
@@ -55,10 +55,10 @@ class WeatherMan:
             year, month_abbr = valid_date
             
             if year and month_abbr:
-                weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
+                weather_records = self.handle_user_input_for_month_and_year(user_input.files_path, valid_date)
                 
-                if len(weather_record):    
-                    self.weather_report_generator.generate_month_temperature_bar_chart(weather_record)
+                if len(weather_records):    
+                    self.weather_report_generator.generate_month_temperature_bar_chart(weather_records)
             else:
                 print("Error: Not a valid month")
         
@@ -67,10 +67,10 @@ class WeatherMan:
             year, month_abbr = valid_date
         
             if year and month_abbr:
-                weather_record = self.handle_user_input_for_month_and_year(user_input.path, valid_date)
+                weather_records = self.handle_user_input_for_month_and_year(user_input.files_path, valid_date)
             
-                if len(weather_record):
-                    self.weather_report_generator.generate_month_temperature_bar_chart_bonus_task(weather_record)
+                if len(weather_records):
+                    self.weather_report_generator.generate_month_temperature_bar_chart_bonus_task(weather_records)
             else:
                 print("Error: Not a valid month")
 

@@ -1,25 +1,25 @@
 import calendar
 import datetime
 
-from Playground.WeatherCalculation import WeatherCalculation
+from WeatherCalculation import WeatherCalculation
 
 class WeatherReportGenerator:
     weather_calculation = WeatherCalculation()
     
-    def generate_year_weather_report(self, weather_record):
+    def generate_year_weather_report(self, weather_records):
         max_temperature, max_temperature_date = (
             self.weather_calculation.calculate_max_weather_reading(
-                weather_record, "Max TemperatureC"
+                weather_records, "Max TemperatureC"
                 )
         )
         min_temperature, min_temperature_date = (
-            self.weather_calculation.calculate_min_temperature_year(
-                weather_record
+            self.weather_calculation.calculate_min_temperature_reading(
+                weather_records
             )
         )
         max_humid, max_humid_date = (
             self.weather_calculation.calculate_max_weather_reading(
-                weather_record,"Max Humidity"
+                weather_records,"Max Humidity"
             )
         )
         calculation_results = {
@@ -29,20 +29,20 @@ class WeatherReportGenerator:
         }
         self.print_year_weather_report(calculation_results)
             
-    def generate_month_weather_report(self, weather_record):
+    def generate_month_weather_report(self, weather_records):
         avg_high_temperature = (
-            self.weather_calculation.calculate_average(
-                weather_record, "Max TemperatureC"
+            self.weather_calculation.calculate_average_temperature(
+                weather_records, "Max TemperatureC"
             )
         )
         avg_low_temperature = (
-            self.weather_calculation.calculate_average(
-                weather_record, "Min TemperatureC"
+            self.weather_calculation.calculate_average_temperature(
+                weather_records, "Min TemperatureC"
             )
         )
         avg_mean_humid = (
-            self.weather_calculation.calculate_average(
-                weather_record, " Mean Humidity"
+            self.weather_calculation.calculate_average_temperature(
+                weather_records, " Mean Humidity"
             )
         )
         
@@ -54,8 +54,8 @@ class WeatherReportGenerator:
         
         self.print_month_weather_report(calculation_results)
         
-    def generate_month_temperature_bar_chart(self, weather_records):
-        for record in weather_records:
+    def generate_month_temperature_bar_chart(self, weather_recordss):
+        for record in weather_recordss:
             day = self.get_date_for_bar_chart(record)
             
             if record["Max TemperatureC"]:
@@ -68,8 +68,8 @@ class WeatherReportGenerator:
                 self.print_star(int(record["Min TemperatureC"]), "\033[94m")
                 print(f"{record['Min TemperatureC']}C")
     
-    def generate_month_temperature_bar_chart_bonus_task(self, weather_record):
-        for reading in weather_record:
+    def generate_month_temperature_bar_chart_bonus_task(self, weather_records):
+        for reading in weather_records:
             
             if reading["Min TemperatureC"] or reading["Max TemperatureC"]:
                 day = self.get_date_for_bar_chart(reading)
@@ -102,14 +102,38 @@ class WeatherReportGenerator:
     def print_year_weather_report(self, calculation_results):
         print("Yearly Weather Report", end="\n\n")
         
-        if calculation_results.get("max_temperature") is not None and calculation_results.get("max_temperature_date"):
-            date = datetime.datetime.strptime(calculation_results.get("max_temperature_date"), "%Y-%m-%d")
-            print(f"Highest: {calculation_results.get('max_temperature')}C on {calendar.month_abbr[date.month]} {date.day}")
+        if (
+            calculation_results.get("max_temperature") is not None 
+            and calculation_results.get("max_temperature_date")
+        ):
+            date = datetime.datetime.strptime(
+                calculation_results.get("max_temperature_date"), "%Y-%m-%d"
+            )
+            print(
+                f"Highest: {calculation_results.get('max_temperature')}C on "
+                f"{calendar.month_abbr[date.month]} {date.day}"
+            )
+
+        if (
+            calculation_results.get("min_temperature") is not None
+            and calculation_results.get("min_temperature_date")
+        ):
+            date = datetime.datetime.strptime(
+                calculation_results.get("min_temperature_date"), "%Y-%m-%d"
+                )
+            print(
+                f"Lowest: {calculation_results.get('min_temperature')}C on "
+                f"{calendar.month_abbr[date.month]} {date.day}"
+                )
         
-        if calculation_results.get("min_temperature") is not None and calculation_results.get("min_temperature_date"):
-            date = datetime.datetime.strptime(calculation_results.get("min_temperature_date"), "%Y-%m-%d")
-            print(f"Lowest: {calculation_results.get('min_temperature')}C on {calendar.month_abbr[date.month]} {date.day}")
-        
-        if calculation_results.get("max_humid") is not None and calculation_results.get("max_humid_date"):
-            date = datetime.datetime.strptime(calculation_results.get("max_humid_date"), "%Y-%m-%d")
-            print(f"Humidity: {calculation_results.get('max_humid')}% on {calendar.month_abbr[date.month]} {date.day}", end="\n\n")
+        if (
+            calculation_results.get("max_humid") is not None
+            and calculation_results.get("max_humid_date")
+        ):
+            date = datetime.datetime.strptime(
+                calculation_results.get("max_humid_date"), "%Y-%m-%d"
+            )
+            print(
+                f"Humidity: {calculation_results.get('max_humid')}% on "
+                f"{calendar.month_abbr[date.month]} {date.day}", end="\n\n"
+            )
