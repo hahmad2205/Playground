@@ -11,7 +11,11 @@ class WeatherCalculation:
             max_weather_readings.append(current_weather_reading)
             max_weather_reading = max(max_weather_readings)
             date_abbr = record["PKT"] if record.get("PKT") else record["PKST"]
-            max_weather_date = date_abbr if current_weather_reading == int(max_weather_reading) else max_weather_date
+            max_weather_date = (
+                date_abbr 
+                if current_weather_reading == int(max_weather_reading)
+                else max_weather_date
+            )
         
         return max_weather_reading, max_weather_date
     
@@ -20,9 +24,7 @@ class WeatherCalculation:
         
         for record in weather_records:
             temperature = record.get(key)
-        
-            if temperature:
-                sum_of_temperatures = sum_of_temperatures + int(record[key])
+            sum_of_temperatures = sum_of_temperatures + int(record[key]) if temperature else 0
         return round(sum_of_temperatures / len(weather_records))
    
     def calculate_min_temperature_year(self, weather_records):
@@ -37,6 +39,10 @@ class WeatherCalculation:
             min_temperatures.append(current_temperature)
             min_temperature = min(min_temperatures)
             date_abbr = record["PKT"] if record.get("PKT") else record["PKST"]
-            min_temperature_date = date_abbr if current_temperature == int(min_temperature) else min_temperature_date
+            min_temperature_date = (
+                date_abbr
+                if current_temperature == int(min_temperature)
+                else min_temperature_date
+            )
         
         return min_temperature, min_temperature_date

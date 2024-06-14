@@ -12,11 +12,8 @@ class WeatherDataParser:
         if matched_year and matched_month_number:    
             year, month = date.split(sep = "/")
             month_abbr = calendar.month_abbr[int(month)] if month else None
-            
-            return year, month_abbr
-        
-        if matched_year:
+        elif matched_year:
             year = matched_year.group()
-            return year, None
+            month_abbr = None
         
-        return None
+        return year, month_abbr

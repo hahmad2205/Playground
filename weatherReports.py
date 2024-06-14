@@ -7,9 +7,21 @@ class WeatherReportGenerator:
     weather_calculation = WeatherCalculation()
     
     def generate_year_weather_report(self, weather_record):
-        max_temperature, max_temperature_date = self.weather_calculation.calculate_max_weather_reading(weather_record, "Max TemperatureC")
-        min_temperature, min_temperature_date = self.weather_calculation.calculate_min_temperature_year(weather_record)
-        max_humid, max_humid_date = self.weather_calculation.calculate_max_weather_reading(weather_record,"Max Humidity")
+        max_temperature, max_temperature_date = (
+            self.weather_calculation.calculate_max_weather_reading(
+                weather_record, "Max TemperatureC"
+                )
+        )
+        min_temperature, min_temperature_date = (
+            self.weather_calculation.calculate_min_temperature_year(
+                weather_record
+            )
+        )
+        max_humid, max_humid_date = (
+            self.weather_calculation.calculate_max_weather_reading(
+                weather_record,"Max Humidity"
+            )
+        )
         calculation_results = {
                         "max_temperature" : max_temperature, "max_temperature_date"  : max_temperature_date,
                         "min_temperature" : min_temperature, "min_temperature_date" : min_temperature_date,
@@ -18,36 +30,50 @@ class WeatherReportGenerator:
         self.print_year_weather_report(calculation_results)
             
     def generate_month_weather_report(self, weather_record):
-        avg_high_temperature = self.weather_calculation.calculate_average(weather_record, "Max TemperatureC")
-        avg_low_temperature = self.weather_calculation.calculate_average(weather_record, "Min TemperatureC")
-        avg_mean_humid = self.weather_calculation.calculate_average(weather_record, " Mean Humidity")
+        avg_high_temperature = (
+            self.weather_calculation.calculate_average(
+                weather_record, "Max TemperatureC"
+            )
+        )
+        avg_low_temperature = (
+            self.weather_calculation.calculate_average(
+                weather_record, "Min TemperatureC"
+            )
+        )
+        avg_mean_humid = (
+            self.weather_calculation.calculate_average(
+                weather_record, " Mean Humidity"
+            )
+        )
         
         calculation_results = {
-                        "avg_high_temperature" : avg_high_temperature, "avg_low_temperature" : avg_low_temperature, "avg_mean_humid" : avg_mean_humid
+                        "avg_high_temperature" : avg_high_temperature,
+                        "avg_low_temperature" : avg_low_temperature,
+                        "avg_mean_humid" : avg_mean_humid
         }
         
         self.print_month_weather_report(calculation_results)
         
-    def generate_month_temperature_bar_chart(self, weather_record):
-        for reading in weather_record:
-            date = self.get_date_for_bar_chart(reading)
+    def generate_month_temperature_bar_chart(self, weather_records):
+        for record in weather_records:
+            day = self.get_date_for_bar_chart(record)
             
-            if reading["Max TemperatureC"]:
-                print(date, end = "    ")
-                self.print_star(int(reading["Max TemperatureC"]), "\033[91m")
-                print(f"{reading['Max TemperatureC']}C")
+            if record["Max TemperatureC"]:
+                print(day, end = "    ")
+                self.print_star(int(record["Max TemperatureC"]), "\033[91m")
+                print(f"{record['Max TemperatureC']}C")
             
-            if reading["Min TemperatureC"]:
-                print(date, end = "    ")
-                self.print_star(int(reading["Min TemperatureC"]), "\033[94m")
-                print(f"{reading['Min TemperatureC']}C")
+            if record["Min TemperatureC"]:
+                print(day, end = "    ")
+                self.print_star(int(record["Min TemperatureC"]), "\033[94m")
+                print(f"{record['Min TemperatureC']}C")
     
     def generate_month_temperature_bar_chart_bonus_task(self, weather_record):
         for reading in weather_record:
             
             if reading["Min TemperatureC"] or reading["Max TemperatureC"]:
-                date = self.get_date_for_bar_chart(reading)
-                print(date, end = "    ")
+                day = self.get_date_for_bar_chart(reading)
+                print(day, end = "    ")
                 
                 if reading["Min TemperatureC"]:
                     self.print_star(int(reading["Min TemperatureC"]), "\033[94m")
