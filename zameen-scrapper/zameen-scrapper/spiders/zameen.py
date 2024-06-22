@@ -59,3 +59,30 @@ class ZameenSpider(CrawlSpider):
         }
         
         self.house_records.append(house_record)
+
+# {'downloader/request_bytes': 656605,
+#  'downloader/request_count': 1289,
+#  'downloader/request_method_count/GET': 1289,
+#  'downloader/response_bytes': 226857378,
+#  'downloader/response_count': 1289,
+#  'downloader/response_status_count/200': 1289,
+#  'dupefilter/filtered': 12,
+#  'elapsed_time_seconds': 493.064812,
+#  'finish_reason': 'finished',
+#  'finish_time': datetime.datetime(2024, 6, 22, 14, 40, 29, 861849, tzinfo=datetime.timezone.utc),
+#  'httpcompression/response_bytes': 1238931685,
+#  'httpcompression/response_count': 1289,
+#  'log_count/DEBUG': 1293,
+#  'log_count/INFO': 18,
+#  'memusage/max': 237535232,
+#  'memusage/startup': 66908160,
+#  'request_depth_max': 50,
+#  'response_received_count': 1289,
+#  'robotstxt/request_count': 1,
+#  'robotstxt/response_count': 1,
+#  'robotstxt/response_status_count/200': 1,
+#  'scheduler/dequeued': 1288,
+#  'scheduler/dequeued/memory': 1288,
+#  'scheduler/enqueued': 1288,
+#  'scheduler/enqueued/memory': 1288,
+#  'start_time': datetime.datetime(2024, 6, 22, 14, 32, 16, 797037, tzinfo=datetime.timezone.utc)}
