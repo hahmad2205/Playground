@@ -60,7 +60,8 @@ class ZameenSpider(CrawlSpider):
         
         self.house_records.append(house_record)
 
-# {'downloader/request_bytes': 656605,
+# {
+#  'downloader/request_bytes': 656605,
 #  'downloader/request_count': 1289,
 #  'downloader/request_method_count/GET': 1289,
 #  'downloader/response_bytes': 226857378,
@@ -85,4 +86,5 @@ class ZameenSpider(CrawlSpider):
 #  'scheduler/dequeued/memory': 1288,
 #  'scheduler/enqueued': 1288,
 #  'scheduler/enqueued/memory': 1288,
-#  'start_time': datetime.datetime(2024, 6, 22, 14, 32, 16, 797037, tzinfo=datetime.timezone.utc)}
+#  'start_time': datetime.datetime(2024, 6, 22, 14, 32, 16, 797037, tzinfo=datetime.timezone.utc)
+# }
