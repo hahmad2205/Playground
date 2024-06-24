@@ -19,15 +19,15 @@ class ZameenSpider(CrawlSpider):
         house_type = response.xpath(f"//span[contains(@aria-label, '{key}')]/text()").get()
         return house_type.strip() if house_type else ""
         
-    def get_amenities_details(self, feature):
-        amenity_type = feature.xpath(".//div/div/text()").get()
-        amenities = feature.xpath("(.//ul/li/span/text())").getall()
-        return amenity_type, amenities
-    
     def get_whatsapp_number(self, response):
         whatsapp_script = response.css("script::text").getall()
         match = self.whatsapp_regex.search(str(whatsapp_script))
         return match.group(1) if match else ""
+    
+    def get_amenities_details(self, feature):
+        amenity_type = feature.xpath(".//div/div/text()").get()
+        amenities = feature.xpath("(.//ul/li/span/text())").getall()
+        return amenity_type, amenities
     
     def store_data_to_json(self, house_record):
         with open("data.json", "w") as json_file:
@@ -52,7 +52,6 @@ class ZameenSpider(CrawlSpider):
         matching_elements = response.xpath(f"//*[contains(text(), 'Amenities')]")
         
         for feature in matching_elements.xpath("following-sibling::div[1]/div/ul/li"):
-            
             category, features = self.get_amenities_details(feature)
             amentities[category] = features
     
@@ -64,8 +63,7 @@ class ZameenSpider(CrawlSpider):
                     "house_description_text": house_description_text, "whatsapp": whatsapp_number,
                     "Amenitites": amentities, "images": house_images_links
         }
-        print(house_record, end="\n\n\n\n")
         
-        
-        self.store_data_to_json(house_record)
+        self.house_records.append(house_record)
+        self.store_data_to_json(self.house_records)
 
