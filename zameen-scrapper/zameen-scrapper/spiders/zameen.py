@@ -2,7 +2,9 @@ import json
 import re
 
 from scrapy.spiders import CrawlSpider, Rule
+from scrapy.signalmanager import dispatcher
 from scrapy.linkextractors import LinkExtractor
+from scrapy import signals
 
 class ZameenSpider(CrawlSpider):
     name = "zameen"
@@ -14,7 +16,7 @@ class ZameenSpider(CrawlSpider):
         Rule(LinkExtractor(restrict_xpaths="//a[contains(@aria-label, 'Listing link')]"), callback="parse_house_records"),
         Rule(LinkExtractor(restrict_xpaths="//a[contains(@title, 'Next')]")),
     )
-    
+        
     def get_house_details(self, response, key):
         house_type = response.xpath(f"//span[contains(@aria-label, '{key}')]/text()").get()
         return house_type.strip() if house_type else ""
@@ -65,5 +67,8 @@ class ZameenSpider(CrawlSpider):
         }
         
         self.house_records.append(house_record)
+
+    def close(self, reason: str):
         self.store_data_to_json(self.house_records)
+        super().close(reason)
 
