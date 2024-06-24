@@ -8,6 +8,7 @@ class ZameenSpider(CrawlSpider):
     allowed_domains = ["www.zameen.com"]
     start_urls = ["https://www.zameen.com/Houses_Property/Lahore-1-1.html"]
     house_records = []
+    whatsapp_regex = re.compile(r'"whatsapp":"(\d{11,13})"')
     rules = (
         Rule(LinkExtractor(restrict_xpaths="//a[contains(@aria-label, 'Listing link')]"), callback="parse_house_records"),
         Rule(LinkExtractor(restrict_xpaths="//a[contains(@title, 'Next')]")),
@@ -23,9 +24,8 @@ class ZameenSpider(CrawlSpider):
         return amenity_type, amenities
     
     def get_whatsapp_number(self, response):
-        whatsapp_script = response.css(f"script::text").getall()
-        regex = "\"whatsapp\":\"(\d{11,13})\""
-        match = re.search(regex, str(whatsapp_script))
+        whatsapp_script = response.css("script::text").getall()
+        match = self.whatsapp_regex.search(str(whatsapp_script))
         return match.group(1) if match else ""
     
     def parse_house_records(self, response):
