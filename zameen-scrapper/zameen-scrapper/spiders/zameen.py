@@ -2,9 +2,8 @@ import json
 import re
 
 from scrapy.spiders import CrawlSpider, Rule
-from scrapy.signalmanager import dispatcher
 from scrapy.linkextractors import LinkExtractor
-from scrapy import signals
+
 
 class ZameenSpider(CrawlSpider):
     name = "zameen"
