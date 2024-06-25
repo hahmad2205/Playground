@@ -39,7 +39,6 @@ class ZameenSpider(CrawlSpider):
     def store_data_to_json(self, house_record):
         with open("data.json", "w") as json_file:
             json.dump(house_record, json_file, indent=4)
-        pass
     
     def parse_house_records(self, response):
         amentities = {}
