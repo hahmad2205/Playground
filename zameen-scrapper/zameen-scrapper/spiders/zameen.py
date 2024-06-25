@@ -13,7 +13,12 @@ class ZameenSpider(CrawlSpider):
     house_records = []
     whatsapp_regex = re.compile(r'"whatsapp":"(\d{11,13})"')
     rules = (
-        Rule(LinkExtractor(restrict_xpaths="//a[contains(@aria-label, 'Listing link')]"), callback="parse_house_records"),
+        Rule(
+            LinkExtractor(
+                    restrict_xpaths="//a[contains(@aria-label, 'Listing link')]"
+            ),
+            callback="parse_house_records"
+        ),
         Rule(LinkExtractor(restrict_xpaths="//a[contains(@title, 'Next')]")),
     )
         
@@ -48,7 +53,11 @@ class ZameenSpider(CrawlSpider):
         house_purpose_text = self.get_house_details(response, "Purpose")
         house_bedrooms_text = self.get_house_details(response, "Beds")
         house_added_text = self.get_house_details(response, "Creation date")
-        house_description_text = (response.xpath(f"string(//div[contains(@aria-label, 'Property description')]/div/span)").get())
+        house_description_text = (
+                            response.xpath(
+                                        f"string(//div[contains(@aria-label, 'Property description')]/div/span)"
+                            ).get()
+        )
         whatsapp_number = self.get_whatsapp_number(response)
         
         house_images_links = response.xpath("//img[contains(@role, 'presentation')]/@src").getall()
