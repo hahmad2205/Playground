@@ -14,11 +14,11 @@ class ZameenSpider(CrawlSpider):
     rules = (
         Rule(
             LinkExtractor(
-                    restrict_xpaths="//a[contains(@aria-label, 'Listing link')]"
+                restrict_xpaths="//a[contains(@aria-label, 'Listing link')]"
             ),
             callback="parse_house_records"
         ),
-        Rule(LinkExtractor(restrict_xpaths="//a[contains(@title, 'Next')]")),
+        # Rule(LinkExtractor(restrict_xpaths="//a[contains(@title, 'Next')]")),
     )
         
     def get_house_details(self, response, key):
@@ -41,7 +41,7 @@ class ZameenSpider(CrawlSpider):
     
     def parse_house_records(self, response):
         amentities = {}
-        house_title_text = response.xpath("//main/div/div/div/h1/text()").get()
+        house_title_text = response.xpath("//h1/text()").get()
         house_header_text = response.xpath("//div[contains(@aria-label, 'Property header')]/text()").get()
         house_type_text = self.get_house_details(response, "Type")
         house_price_text = response.xpath(f"string(//span[contains(@aria-label, 'Price')]/div)").get()
@@ -52,9 +52,9 @@ class ZameenSpider(CrawlSpider):
         house_bedrooms_text = self.get_house_details(response, "Beds")
         house_added_text = self.get_house_details(response, "Creation date")
         house_description_text = (
-                            response.xpath(
-                                        f"string(//div[contains(@aria-label, 'Property description')]/div/span)"
-                            ).get()
+            response.xpath(
+                        f"string(//div[contains(@aria-label, 'Property description')]/div/span)"
+            ).get()
         )
         whatsapp_number = self.get_whatsapp_number(response)
         
@@ -67,18 +67,18 @@ class ZameenSpider(CrawlSpider):
             amentities[category] = features
     
         house_record = {
-                    "title": house_title_text, "header": house_header_text,
-                    "Type": house_type_text, "Price": house_price_text,
-                    "Location": house_location_text, "Baths": house_baths_text,
-                    "Area": house_area_text, "Purpose": house_purpose_text,
-                    "Bedrooms": house_bedrooms_text, "added_date": house_added_text,
-                    "house_description_text": house_description_text, "whatsapp": whatsapp_number,
-                    "Amenitites": amentities, "images": house_images_links
+            "title": house_title_text, "header": house_header_text,
+            "Type": house_type_text, "Price": house_price_text,
+            "Location": house_location_text, "Baths": house_baths_text,
+            "Area": house_area_text, "Purpose": house_purpose_text,
+            "Bedrooms": house_bedrooms_text, "added_date": house_added_text,
+            "house_description_text": house_description_text, "whatsapp": whatsapp_number,
+            "Amenitites": amentities, "images": house_images_links
         }
         
         self.house_records.append(house_record)
 
-    def close(self, reason: str):
-        self.store_data_to_json(self.house_records)
-        super().close(reason)
+    # def close(self, reason: str):
+    #     self.store_data_to_json(self.house_records)
+    #     super().close(reason)
 
