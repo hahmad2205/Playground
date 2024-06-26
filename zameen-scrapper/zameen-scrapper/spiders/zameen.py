@@ -18,7 +18,7 @@ class ZameenSpider(CrawlSpider):
             ),
             callback="parse_house_records"
         ),
-        # Rule(LinkExtractor(restrict_xpaths="//a[contains(@title, 'Next')]")),
+        Rule(LinkExtractor(restrict_xpaths="//a[contains(@title, 'Next')]")),
     )
         
     def get_house_details(self, response, key):
@@ -53,7 +53,7 @@ class ZameenSpider(CrawlSpider):
         house_added_text = self.get_house_details(response, "Creation date")
         house_description_text = (
             response.xpath(
-                        f"string(//div[contains(@aria-label, 'Property description')]/div/span)"
+                f"string(//div[contains(@aria-label, 'Property description')]/div/span)"
             ).get()
         )
         whatsapp_number = self.get_whatsapp_number(response)
@@ -78,7 +78,7 @@ class ZameenSpider(CrawlSpider):
         
         self.house_records.append(house_record)
 
-    # def close(self, reason: str):
-    #     self.store_data_to_json(self.house_records)
-    #     super().close(reason)
+    def close(self, reason: str):
+        self.store_data_to_json(self.house_records)
+        super().close(reason)
 
