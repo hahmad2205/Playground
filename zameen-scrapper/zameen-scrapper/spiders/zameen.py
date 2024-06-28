@@ -37,6 +37,7 @@ class ZameenSpider(CrawlSpider):
     def parse_house_records(self, response):
         amentities = {}
         house_title_text = response.xpath("//h1/text()").get()
+        house_id_text = response.xpath("//div/span[contains(@aria-label, 'Link name')]/text()").get()
         house_header_text = response.xpath("//div[contains(@aria-label, 'Property header')]/text()").get()
         house_type_text = self.get_house_details(response, "Type")
         house_price_text = response.xpath(f"string(//span[contains(@aria-label, 'Price')]/div)").get()
@@ -62,13 +63,14 @@ class ZameenSpider(CrawlSpider):
             amentities[category] = features
     
         house_record = {
-            "title": house_title_text, "header": house_header_text,
-            "Type": house_type_text, "Price": house_price_text,
-            "Location": house_location_text, "Baths": house_baths_text,
-            "Area": house_area_text, "Purpose": house_purpose_text,
-            "Bedrooms": house_bedrooms_text, "added_date": house_added_text,
-            "house_description_text": house_description_text, "whatsapp": whatsapp_number,
-            "Amenitites": amentities, "images": house_images_links
+            "id": house_id_text, "title": house_title_text,
+            "header": house_header_text, "Type": house_type_text,
+            "Price": house_price_text, "Location": house_location_text,
+            "Baths": house_baths_text, "Area": house_area_text,
+            "Purpose": house_purpose_text, "Bedrooms": house_bedrooms_text,
+            "added_date": house_added_text, "house_description_text": house_description_text,
+            "whatsapp": whatsapp_number, "Amenitites": amentities,
+            "images": house_images_links
         }
         
         yield house_record
