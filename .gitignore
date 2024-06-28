@@ -1,7 +1,7 @@
 zameen-scrapper/zameen-scrapper/__pycache__
 zameen-scrapper/zameen-scrapper/spiders/__pycache__
 zameen-scrapper/zameen-scrapper/__init__.py
-zameen-scrapper/zameen-scrapper/data.json
+zameen-scrapper/house_in_lahore_data.json
 zameen-scrapper/zameen-scrapper/middlewares.py
 zameen-scrapper/zameen-scrapper/pipelines.py
 zameen-scrapper/zameen-scrapper/settings.py

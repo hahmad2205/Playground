@@ -1,4 +1,3 @@
-import json
 import re
 
 from scrapy.spiders import CrawlSpider, Rule
@@ -34,11 +33,7 @@ class ZameenSpider(CrawlSpider):
         amenity_type = feature.xpath(".//div/div/text()").get()
         amenities = feature.xpath("(.//ul/li/span/text())").getall()
         return amenity_type, amenities
-    
-    def store_data_to_json(self, house_record):
-        with open("data.json", "w") as json_file:
-            json.dump(house_record, json_file, indent=4)
-    
+        
     def parse_house_records(self, response):
         amentities = {}
         house_title_text = response.xpath("//h1/text()").get()
@@ -76,9 +71,5 @@ class ZameenSpider(CrawlSpider):
             "Amenitites": amentities, "images": house_images_links
         }
         
-        self.house_records.append(house_record)
-
-    def close(self, reason: str):
-        self.store_data_to_json(self.house_records)
-        super().close(reason)
+        yield house_record
 
