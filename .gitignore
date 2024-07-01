@@ -1,1 +1,14 @@
-zameen-scrapper
+zameen-scrapper/zameen-scrapper/__pycache__
+zameen-scrapper/zameen-scrapper/spiders/__pycache__
+zameen-scrapper/zameen-scrapper/__init__.py
+zameen-scrapper/house_in_lahore_data.json
+zameen-scrapper/zameen-scrapper/middlewares.py
+zameen-scrapper/zameen-scrapper/pipelines.py
+zameen-scrapper/zameen-scrapper/settings.py
+zameen-scrapper/zameen-scrapper/spiders/__pycache__
+zameen-scrapper/zameen-scrapper/spiders/__pycache__/__init__.cpython-310.pyc
+zameen-scrapper/zameen-scrapper/spiders/__pycache__/quotes_spider.cpython-310.pyc
+zameen-scrapper/zameen-scrapper/spiders/__init__.py
+zameen-scrapper/zameen-scrapper/items.py
+zameen-scrapper/zameen-scrapper/settings.py
+zameen-scrapper/scrapy.cfg
