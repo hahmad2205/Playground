@@ -12,3 +12,8 @@ zameen-scrapper/zameen-scrapper/spiders/__init__.py
 zameen-scrapper/zameen-scrapper/items.py
 zameen-scrapper/zameen-scrapper/settings.py
 zameen-scrapper/scrapy.cfg
+
+djangoPractice/.vscode
+djangoPractice/myenv
+djangoPractice/mysite/db.sqlite3
+djangoPractice/mysite/mysite/__pycache__
