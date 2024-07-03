@@ -2,40 +2,42 @@ from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
 from core.models import AmenityOption
-from users.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Property(TimeStampedModel):
     area = models.CharField(max_length=255)
-    description_text = models.TextField()
-    header = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    listing_purpose = models.CharField(max_length=255)
-    number_of_bath = models.PositiveIntegerField()
-    number_of_bed = models.PositiveIntegerField()
+    description = models.TextField()
+    header = models.TextField()
+    location = models.TextField()
+    purpose = models.CharField(max_length=255, default="for sale")
+    number_of_bath = models.PositiveSmallIntegerField()
+    number_of_bed = models.PositiveSmallIntegerField()
     price = models.PositiveIntegerField()
     title = models.CharField(max_length=255)
-    type = models.CharField(max_length=255)
-    whatsapp = models.CharField(max_length=13)
+    type = models.CharField(max_length=255, default="house")
+    whatsapp_number = models.CharField(max_length=13)
     
     def __str__(self):
         return self.title
 
 
 class PropertyImages(TimeStampedModel):
-    image_link = models.TextField()
+    image_url = models.TextField()
+    image = models.FileField()
     
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_images")
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
     
     def __str__(self):
-        return self.property.title
+        return self.property
 
 
 class PropertyOffers(TimeStampedModel):
-    offer_price = models.PositiveIntegerField()
+    price = models.PositiveIntegerField()
     
-    offered_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="offers_received")
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="offers_made")
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_offers")
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
     
     def __str__(self):
         return f"{self.property.title} - {self.offer_price}"
@@ -44,9 +46,9 @@ class PropertyOffers(TimeStampedModel):
 class PropertyAmenity(TimeStampedModel):
     value = models.PositiveIntegerField()
     
-    key = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name='amenity_options')
+    amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name='amenity_options')
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_amenities')
 
     def __str__(self):
-        return f"{self.property.title} - {self.key.key}: {self.value}"
+        return f"{self.property.title} - {self.amenity.amenity}: {self.value}"
 

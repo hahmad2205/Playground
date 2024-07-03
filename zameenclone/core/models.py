@@ -11,8 +11,8 @@ class Amenity(TimeStampedModel):
 class AmenityOption(TimeStampedModel):
     option = models.CharField(max_length=255)
     
-    type = models.ForeignKey(Amenity, on_delete=models.CASCADE, related_name="options")
+    amenity = models.ForeignKey(Amenity, on_delete=models.CASCADE, related_name="options")
     
     def __str__(self):
-        return self.key
+        return self.amenity
 
