@@ -19,6 +19,9 @@ class Property(TimeStampedModel):
     type = models.CharField(max_length=255, default="house")
     whatsapp_number = models.CharField(max_length=13)
     
+    amenities =models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
+    
+    
     def __str__(self):
         return self.title
 
@@ -46,7 +49,7 @@ class PropertyOffers(TimeStampedModel):
 class PropertyAmenity(TimeStampedModel):
     value = models.PositiveIntegerField()
     
-    amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name='amenity_options')
+    amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name='options')
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_amenities')
 
     def __str__(self):
