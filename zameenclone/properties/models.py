@@ -39,7 +39,7 @@ class PropertyImages(TimeStampedModel):
 class PropertyOffers(TimeStampedModel):
     price = models.PositiveIntegerField()
     
-    offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="offers_made")
+    offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
     
     def __str__(self):
