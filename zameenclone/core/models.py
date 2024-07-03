@@ -1,22 +1,15 @@
 from django.db import models
-
-class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
-
+from django_extensions.db.models import TimeStampedModel
 
 class Amenity(TimeStampedModel):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
     
     def __str__(self):
         return self.name
 
 
 class AmenityOption(TimeStampedModel):
-    key = models.CharField(max_length=50)
+    option = models.CharField(max_length=255)
     
     type = models.ForeignKey(Amenity, on_delete=models.CASCADE, related_name="options")
     

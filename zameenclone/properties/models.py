@@ -1,8 +1,8 @@
 from django.db import models
-from core.models import AmenityOption, TimeStampedModel
+from django_extensions.db.models import TimeStampedModel
+
+from core.models import AmenityOption
 from users.models import User
-
-
 
 class Property(TimeStampedModel):
     area = models.CharField(max_length=255)
