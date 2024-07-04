@@ -21,7 +21,6 @@ class Property(TimeStampedModel):
     
     amenities =models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
     
-    
     def __str__(self):
         return self.title
 
@@ -47,7 +46,7 @@ class PropertyOffers(TimeStampedModel):
 
 
 class PropertyAmenity(TimeStampedModel):
-    value = models.PositiveIntegerField()
+    value = models.PositiveIntegerField(null=True, blank=True)
     
     amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name='options')
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_amenities')
