@@ -3,12 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 
 def login_user(request):
     if request.user.is_authenticated:
-        response = redirect('logout')
+        response = redirect('property/')
     elif request.method == "POST":
         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
         if user is not None:
             login(request, user)
-            response = redirect('logout')
+            response = redirect('properties/')
         else:
             response = render(request, "users/login.html", {"message": "Invalid username or password"})
     else:
@@ -21,6 +21,6 @@ def logout_user(request):
         logout(request)
         response = redirect('login')
     else:
-        response = render(request, "users/logout.html", {})
+        response = redirect('property/')
     
     return response
