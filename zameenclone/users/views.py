@@ -6,15 +6,19 @@ def login_user(request):
         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
         if user is not None:
             login(request, user)
-            return redirect('logout')
+            response = redirect('logout')
         else:
-            return render(request, "users/login.html", {"message": "Invalid username or password"})
+            response = render(request, "users/login.html", {"message": "Invalid username or password"})
     else:
-        return render(request, "users/login.html", {})
+        response = render(request, "users/login.html", {})
+        
+    return response
 
 def logout_user(request):
     if request.method == "POST":
         logout(request)
-        return redirect('login')
+        response = redirect('login')
     else:
-        return render(request, "users/logout.html", {})
+        response = render(request, "users/logout.html", {})
+    
+    return response
