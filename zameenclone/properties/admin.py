@@ -1,10 +1,14 @@
 from django.contrib import admin
 from .models import Property, PropertyImages
 
-class ImageInline(admin.StackedInline):
+from .models import Property, PropertyImages, PropertyOffers
+
+class PropertyImagesInline(admin.TabularInline):
     model = PropertyImages
     extra = 5
 
 class PropertyAdmin(admin.ModelAdmin):
-    inlines = [ImageInline]
-admin.site.register(Property)
+    inlines = [PropertyImagesInline]
+
+admin.site.register(Property, PropertyAdmin)
+admin.site.register(PropertyOffers)
