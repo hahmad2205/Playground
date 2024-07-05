@@ -33,7 +33,7 @@ class Command(BaseCommand):
         property_records = json.load(file)
         
         for record in property_records:
-            property, created = self.store_property_to_db(record)
+            property = self.store_property_to_db(record)
             self.store_images_to_db(record["images"], property)
             self.store_amenity_to_db()
             self.store_amenity_values_to_db(record["Amenitites"], property)
@@ -51,7 +51,7 @@ class Command(BaseCommand):
         type = record["Type"]
         whatsapp_number = record["whatsapp"]
         
-        return Property.objects.get_or_create(
+        property, created = Property.objects.get_or_create(
             area = area,
             description = description,
             header = header,
@@ -64,6 +64,8 @@ class Command(BaseCommand):
             type = type,
             whatsapp_number = whatsapp_number
         )
+        
+        return property
         
     def store_images_to_db(self, images, property):
         for image in images:
@@ -101,25 +103,26 @@ class Command(BaseCommand):
 
     def store_amenity_values_to_db(self, amenities, property):
         for amenity_name, amenity_options in amenities.items():
-            for index, amenity_option in enumerate(amenity_options):
-                try:
-                    amenity_option_instance = AmenityOption.objects.get(option=amenity_option.lower())                   
-                    if amenity_option_instance:
-                        value = None
-                        if index + 1 < len(amenity_options):
-                            next_option = amenity_options[index + 1]
-                            if len(next_option.split()) > 1:
-                                value_part = next_option.split()[1]
-                                if self.is_integer(value_part):
-                                    value = int(value_part)
-                        
-                        property_amenities_instance, created = PropertyAmenity.objects.get_or_create(
-                            property=property,
-                            amenity=amenity_option_instance,
-                            value=value
-                        )
-                        
-                        property.amenities.add(property_amenities_instance)
-                        
-                except AmenityOption.DoesNotExist:
-                    pass
+            if amenity_name.lower() in ["main features", "rooms"]:
+                for index, amenity_option in enumerate(amenity_options):
+                    try:
+                        amenity_option_instance = AmenityOption.objects.get(option=amenity_option.lower())                   
+                        if amenity_option_instance:
+                            value = None
+                            if index + 1 < len(amenity_options):
+                                next_option = amenity_options[index + 1]
+                                if len(next_option.split()) > 1:
+                                    value_part = next_option.split()[1]
+                                    if self.is_integer(value_part):
+                                        value = int(value_part)
+                            
+                            property_amenity, created = PropertyAmenity.objects.get_or_create(
+                                property=property,
+                                amenity=amenity_option_instance,
+                                value=value
+                            )
+                            property.amenities.add(property_amenity)
+                            
+                    except AmenityOption.DoesNotExist:
+                        pass
+
