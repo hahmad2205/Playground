@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import Property
-# Register your models here.
+from .models import Property, PropertyImages, PropertyOffers
 
-admin.site.register(Property)
+class PropertyImagesInline(admin.TabularInline):
+    model = PropertyImages
+    extra = 5
+
+class PropertyAdmin(admin.ModelAdmin):
+    inlines = [PropertyImagesInline]
+
+admin.site.register(Property, PropertyAdmin)
+admin.site.register(PropertyOffers)

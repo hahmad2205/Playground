@@ -1,8 +1,8 @@
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from django.contrib.auth import get_user_model
 
 from core.models import AmenityOption
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -19,7 +19,8 @@ class Property(TimeStampedModel):
     type = models.CharField(max_length=255, default="house")
     whatsapp_number = models.CharField(max_length=13)
     
-    amenities =models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
+    amenities = models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
     
     def __str__(self):
         return self.title
@@ -32,7 +33,7 @@ class PropertyImages(TimeStampedModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
     
     def __str__(self):
-        return self.property
+        return self.property.title
 
 
 class PropertyOffers(TimeStampedModel):
@@ -42,7 +43,7 @@ class PropertyOffers(TimeStampedModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
     
     def __str__(self):
-        return f"{self.property.title} - {self.offer_price}"
+        return f"{self.property.title} - {self.price}"
 
 
 class PropertyAmenity(TimeStampedModel):
@@ -52,5 +53,5 @@ class PropertyAmenity(TimeStampedModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_amenities')
 
     def __str__(self):
-        return f"{self.property.title} - {self.amenity.amenity}: {self.value}"
+        return f"{self.property} | ID: {self.id}"
 
