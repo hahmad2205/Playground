@@ -8,7 +8,7 @@ def login_user(request):
         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
         if user is not None:
             login(request, user)
-            response = redirect('properties/')
+            response = redirect('property/')
         else:
             response = render(request, "users/login.html", {"message": "Invalid username or password"})
     else:

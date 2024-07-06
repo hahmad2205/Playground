@@ -24,7 +24,7 @@ class Property(TimeStampedModel):
     
     def __str__(self):
         return self.title
-
+        
 
 class PropertyImages(TimeStampedModel):
     image_url = models.TextField()
