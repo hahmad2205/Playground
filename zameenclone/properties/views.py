@@ -40,12 +40,13 @@ def properties(request):
         else:
             properties = Property.objects.filter(owner=request.user)
     else:  
-        properties = PropertyFilter(request.GET, queryset=Property.objects.all()).qs
+        properties = PropertyFilter(request.GET, queryset=Property.objects.filter(owner=request.user)).qs
         
     return render(
         request, "properties/property_listing.html",
         {
             "properties": create_pagination(properties, request),
-            "path": request.path
+            "path": request.path,
+            "filter": PropertyFilter(request.GET, queryset=Property.objects.filter(owner=request.user))
         }
     )
