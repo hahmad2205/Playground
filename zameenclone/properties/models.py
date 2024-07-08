@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Prefetch
 from django_extensions.db.models import TimeStampedModel
 from django.contrib.auth import get_user_model
 
@@ -21,10 +22,25 @@ class Property(TimeStampedModel):
     
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
+
+    def get_first_image(self):
+        return self.images.first()
+    
+    @classmethod
+    def get_images_from_properties(cls, properties):
+        prefetch_images = Prefetch('images', queryset=PropertyImages.objects.all().order_by('pk'))
+        
+        return [
+            {
+                "property": property,
+                "image_url": property.images.first().image_url if property.images.first() else None
+            }
+            for property in cls.objects.prefetch_related(prefetch_images).filter(id__in=[p.id for p in properties])
+        ]
     
     def __str__(self):
         return self.title
-
+        
 
 class PropertyImages(TimeStampedModel):
     image_url = models.TextField()
