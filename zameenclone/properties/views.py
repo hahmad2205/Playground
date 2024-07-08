@@ -5,6 +5,7 @@ from django.db.models import Q
 from .models import Property
 from core.utils import create_pagination
 
+@login_required
 def marketplace(request):
     if request.method == "POST":
         properties = Property.objects.filter(Q(title__contains=request.POST.get("search")) | Q(location__contains=request.POST.get("search")))
