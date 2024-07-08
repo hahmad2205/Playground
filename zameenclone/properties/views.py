@@ -34,3 +34,10 @@ def properties(request):
             "path": request.path
         }
     )
+    
+@login_required
+def app_property(request):
+    if request.method == "POST":
+        pass
+    else:
+        pass
