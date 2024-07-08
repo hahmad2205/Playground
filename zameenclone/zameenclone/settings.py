@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'properties.apps.PropertiesConfig',
     'core.apps.CoreConfig',
     'django_extensions',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

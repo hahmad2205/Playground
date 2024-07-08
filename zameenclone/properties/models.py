@@ -1,14 +1,16 @@
 from django.db import models
 from django.db.models import Prefetch
-from django_extensions.db.models import TimeStampedModel
 from django.contrib.auth import get_user_model
+
+from django_extensions.db.models import TimeStampedModel
+import django_filters
 
 from core.models import AmenityOption
 
 User = get_user_model()
 
 class Property(TimeStampedModel):
-    area = models.CharField(max_length=255)
+    area = models.PositiveIntegerField()
     description = models.TextField()
     header = models.TextField()
     location = models.TextField()
@@ -20,7 +22,7 @@ class Property(TimeStampedModel):
     type = models.CharField(max_length=255, default="house")
     whatsapp_number = models.CharField(max_length=13)
     
-    amenities = models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
+    amenities = models.ManyToManyField("properties.PropertyAmenity", related_name="amenities")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
 
     def get_first_image(self):
@@ -28,7 +30,7 @@ class Property(TimeStampedModel):
     
     @classmethod
     def get_images_from_properties(cls, properties):
-        prefetch_images = Prefetch('images', queryset=PropertyImages.objects.all().order_by('pk'))
+        prefetch_images = Prefetch("images", queryset=PropertyImages.objects.all().order_by("pk"))
         
         return [
             {
@@ -40,7 +42,28 @@ class Property(TimeStampedModel):
     
     def __str__(self):
         return self.title
-        
+
+class PropertyFilter(django_filters.FilterSet):
+    price = django_filters.NumberFilter()
+    price__gt = django_filters.NumberFilter(field_name="price", lookup_expr="gt")
+    price__lt = django_filters.NumberFilter(field_name="price", lookup_expr="lt")
+
+    number_of_bed = django_filters.NumberFilter()
+    number_of_bed__gt = django_filters.NumberFilter(field_name="number_of_bed", lookup_expr="gt")
+    number_of_bed__lt = django_filters.NumberFilter(field_name="number_of_bed", lookup_expr="lt")
+    
+    number_of_bath = django_filters.NumberFilter()
+    number_of_bath__gt = django_filters.NumberFilter(field_name="number_of_bath", lookup_expr="gt")
+    number_of_bath__gt = django_filters.NumberFilter(field_name="number_of_bath", lookup_expr="gt")
+    
+    area = django_filters.NumberFilter()
+    area__gt = django_filters.NumberFilter(field_name="area", lookup_expr="gt")
+    area__lt = django_filters.NumberFilter(field_name="area", lookup_expr="lt")
+
+    class Meta:
+        model = Property
+        fields = ["price", "number_of_bed", "number_of_bath", "area"]
+
 
 class PropertyImages(TimeStampedModel):
     image_url = models.TextField()
@@ -65,8 +88,8 @@ class PropertyOffers(TimeStampedModel):
 class PropertyAmenity(TimeStampedModel):
     value = models.PositiveIntegerField(null=True, blank=True)
     
-    amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name='options')
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_amenities')
+    amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name="options")
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_amenities")
 
     def __str__(self):
         return f"{self.property} | ID: {self.id}"
