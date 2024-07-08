@@ -31,10 +31,17 @@ def marketplace(request):
 @login_required
 def properties(request):
     if request.method == "POST":
-        properties = Property.objects.filter(Q(title__contains=request.POST.get("search")) | Q(location__contains=request.POST.get("search")))
-    else:
-        properties = Property.objects.filter(owner=request.user)
-    
+        search_item = request.POST.get("search", "")
+        if search_item:
+            properties = Property.objects.filter(
+                Q(title__icontains=search_item) |
+                Q(location__icontains=search_item)
+            )
+        else:
+            properties = Property.objects.filter(owner=request.user)
+    else:  
+        properties = PropertyFilter(request.GET, queryset=Property.objects.all()).qs
+        
     return render(
         request, "properties/property_listing.html",
         {
