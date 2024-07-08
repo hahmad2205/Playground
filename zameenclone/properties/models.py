@@ -21,19 +21,18 @@ class Property(TimeStampedModel):
     
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
-    
+
     def get_first_image(self):
-        first_image = self.images.first()
-        return first_image.image_url if first_image else None
+        return self.images.first()
     
-    def get_images_from_property(properties):
+    @classmethod
+    def get_images_from_properties(cls, properties):
         properties_with_images = []
         
         for property in properties:
-            images = property.images.all()
             properties_with_images.append({
                 "property": property,
-                "image_url": images[0].image_url
+                "image_url": property.get_first_image().image_url if property.get_first_image() else None
             })
             
         return properties_with_images
