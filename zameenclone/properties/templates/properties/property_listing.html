@@ -2,12 +2,12 @@
 
 {% block listings %}
 <div class="d-flex justify-content-end mb-3">
-  {% if path == "/property/" %}
-    <a href="/property/my_listings" class="me-3">
+  {% if path == "/property/marketplace/" %}
+    <a href="/property/properties" class="me-3">
       <button type="button" class="btn btn-primary">My listings</button>
     </a>
   {% else %}
-    <a href="/property" class="me-3">
+    <a href="/property/marketplace" class="me-3">
       <button type="button" class="btn btn-primary">Marketplace listings</button>
     </a>
   {% endif %}
@@ -20,6 +20,15 @@
 
 
 <div>
+  <form action="" method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="search-bar" class="form-label">Search</label>
+      <input type="text" class="form-control" id="search-bar" aria-describedby="emailHelp" name="search">
+    </div>
+    <input type="submit" class="btn btn-primary" value="Search"/>
+  </form>
+
   {% for property in properties %}
     <div class="card mb-3 mx-auto" style="max-width: 70%;">
       <div class="row g-0 justify-content-between">

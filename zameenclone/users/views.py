@@ -5,10 +5,10 @@ def login_user(request):
     if request.user.is_authenticated:
         response = redirect('property/')
     elif request.method == "POST":
-        user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+        user = authenticate(request, username=request.POST.get("username"), password=request.POST.get("password"))
         if user is not None:
             login(request, user)
-            response = redirect('property/')
+            response = redirect('property/marketplace')
         else:
             response = render(request, "users/login.html", {"message": "Invalid username or password"})
     else:
@@ -21,6 +21,6 @@ def logout_user(request):
         logout(request)
         response = redirect('login')
     else:
-        response = redirect('property/')
+        response = redirect('property/marketplace')
     
     return response
