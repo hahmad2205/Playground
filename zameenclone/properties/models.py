@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Prefetch
 from django_extensions.db.models import TimeStampedModel
 from django.contrib.auth import get_user_model
 
@@ -27,15 +28,15 @@ class Property(TimeStampedModel):
     
     @classmethod
     def get_images_from_properties(cls, properties):
-        properties_with_images = []
+        prefetch_images = Prefetch('images', queryset=PropertyImages.objects.all().order_by('pk'))
         
-        for property in properties:
-            properties_with_images.append({
+        return [
+            {
                 "property": property,
-                "image_url": property.get_first_image().image_url if property.get_first_image() else None
-            })
-            
-        return properties_with_images
+                "image_url": property.images.first().image_url if property.images.first() else None
+            }
+            for property in cls.objects.prefetch_related(prefetch_images).filter(id__in=[p.id for p in properties])
+        ]
     
     def __str__(self):
         return self.title
