@@ -10,7 +10,7 @@ from core.models import AmenityOption
 User = get_user_model()
 
 class Property(TimeStampedModel):
-    area = models.PositiveIntegerField()
+    area = models.PositiveSmallIntegerField()
     description = models.TextField()
     header = models.TextField()
     location = models.TextField()

@@ -25,7 +25,7 @@ class Command(BaseCommand):
         
         return price_in_numbers
 
-    def convert_area_to_number(self, area):
+    def convert_area_in_marla(self, area):
         parts = area.split()
         area_number = float(parts[0])
         area_text = parts[1].lower()
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         return area_in_numbers
     
     def store_property_to_db(self, record):
-        area = self.convert_area_to_number(record["Area"])
+        area = self.convert_area_in_marla(record["Area"])
         description = record["house_description_text"]
         header = record["header"]
         location = record["Location"]
@@ -127,10 +127,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **kwargs):
-        path = kwargs["file"]
-        
-        file = open(path, "r")
-        property_records = json.load(file)
+        property_records = json.load(open(kwargs["file"], "r"))
         
         for record in property_records:
             property = self.store_property_to_db(record)
