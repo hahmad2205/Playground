@@ -1,0 +1,49 @@
+{% extends "properties/base_listing.html" %}
+
+{% block listings %}
+    <h2>Add Property</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ property_form.as_p }}
+
+        <h3>Images</h3>
+        {{ image_formset.management_form }}
+        {% for form in image_formset %}
+            {{ form.as_p }}
+        {% endfor %}
+
+        <h3>Amenities</h3>
+        {{ amenity_formset.management_form }}
+        {% for form in amenity_formset %}
+            {{ form.as_p }}
+        {% endfor %}
+
+        <button type="submit">Save</button>
+    </form>
+
+{% endblock listings%}
+
+{% block script %}
+<script>    
+$(document).ready(function() {
+    $('.amenity-dropdown').change(function() {
+        var $this = $(this);
+        var amenityID = $this.val();
+        console.log(amenityID);  // Check if amenityID is logged correctly
+        var $optionDropdown = $this.closest('form').find('.amenity-option-dropdown');
+        $.ajax({
+            url: '{% url "core:get_amenity_options" %}',
+            data: {
+                'amenity_id': amenityID
+            },
+            success: function(data) {
+                $optionDropdown.html(data);
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.error('AJAX Error:', textStatus, errorThrown);
+            }
+        });
+    });
+    });
+</script
+{% endblock script %}

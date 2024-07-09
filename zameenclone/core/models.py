@@ -14,5 +14,5 @@ class AmenityOption(TimeStampedModel):
     amenity = models.ForeignKey(Amenity, on_delete=models.CASCADE, related_name="options")
     
     def __str__(self):
-        return self.amenity
+        return self.option
 
