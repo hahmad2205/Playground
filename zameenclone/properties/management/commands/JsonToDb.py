@@ -25,21 +25,20 @@ class Command(BaseCommand):
         
         return price_in_numbers
 
+    def convert_area_in_marla(self, area):
+        parts = area.split()
+        area_number = float(parts[0])
+        area_text = parts[1].lower()
+        area_in_numbers = 0
+        if area_text == "marla":
+            area_in_numbers = area_number * 1
+        elif area_text == "kanal":
+            area_in_numbers = area_number * 20
         
-    def handle(self, *args, **kwargs):
-        path = kwargs["file"]
-        
-        file = open(path, "r")
-        property_records = json.load(file)
-        
-        for record in property_records:
-            property = self.store_property_to_db(record)
-            self.store_images_to_db(record["images"], property)
-            self.store_amenity_to_db()
-            self.store_amenity_values_to_db(record["Amenitites"], property)
-            
+        return area_in_numbers
+    
     def store_property_to_db(self, record):
-        area = record["Area"]
+        area = self.convert_area_in_marla(record["Area"])
         description = record["house_description_text"]
         header = record["header"]
         location = record["Location"]
@@ -125,4 +124,15 @@ class Command(BaseCommand):
                             
                     except AmenityOption.DoesNotExist:
                         pass
+
+
+    def handle(self, *args, **kwargs):
+        property_records = json.load(open(kwargs["file"], "r"))
+        
+        for record in property_records:
+            property = self.store_property_to_db(record)
+            self.store_images_to_db(record["images"], property)
+            self.store_amenity_to_db()
+            self.store_amenity_values_to_db(record["Amenitites"], property)
+            self.stdout.write(self.style.SUCCESS(f"Property {property.title} is created by id {property.id}"))
 

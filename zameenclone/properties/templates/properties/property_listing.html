@@ -29,6 +29,11 @@
     <input type="submit" class="btn btn-primary" value="Search"/>
   </form>
 
+  <form method="get">
+    {{ filter.form.as_p }}
+    <input class="btn btn-primary" type="submit" />
+  </form>
+
   {% for property in properties %}
     <a href="{% url 'property_detail' property.property.id %}">
       <div class="card mb-3 mx-auto" style="max-width: 70%;">
@@ -43,9 +48,20 @@
                 <h5 class="col-3 ms-auto fs-4">PKR {{ property.property.price }}</h5>
               </span>
               <p class="card-text fs-5">{{ property.property.header }}</p>
-              <p class="card-text fs-6"><small class="text-body-secondary">Beds {{ property.property.number_of_bed }}  Baths {{ property.property.number_of_bath }}</small></p>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="card-text fs-6"><small class="text-body-secondary">Beds {{ property.property.number_of_bed }}  Baths {{ property.property.number_of_bath }}</small></p>
+                  <p class="card-text fs-6"><small class="text-body-secondary">Area {{ property.property.area }}  Marla</small></p>
+                </div>
+                {% if path == "/property/properties/" %}
+                  <form action="" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="property_id" value="{{ property.property.id }}"/>
+                    <input type="submit" class="btn btn-danger" value="Delete"/>
+                  </form>
+                {% endif %}
+              </div>
             </div>
-          </div>
         </div>
       </div>
     </a>
