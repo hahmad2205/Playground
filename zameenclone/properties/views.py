@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
-from .models import Property, PropertyImages, PropertyAmenity, PropertyFilter
+from .models import Property
 from core.utils import create_pagination
 
 @login_required
