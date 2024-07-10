@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
-from .models import Property
+from .models import Property,PropertyFilter
 from core.utils import create_pagination
 
 @login_required
@@ -43,6 +43,7 @@ def properties(request):
             property_instance.save()
             property_instance.images.all().update(is_active=False)
             property_instance.amenities.all().update(is_active=False)
+            property_instance.offers.all().update(is_active=False)
             properties = queryset
     elif request.method == "GET":
         properties = PropertyFilter(request.GET, queryset=queryset).qs if request.GET.get("price") else queryset
