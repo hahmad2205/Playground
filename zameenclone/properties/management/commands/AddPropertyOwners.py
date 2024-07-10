@@ -1,11 +1,16 @@
 from django.core.management.base import BaseCommand
+
 from users.models import User
 from properties.models import Property
+
+from faker import Faker
+fake = Faker()
 
 class Command(BaseCommand):
     help = "Add users foreign key to existing records"
         
     def handle(self, *args, **kwargs):
+        self.generate_fake_users()
         users = User.objects.all()
         if not users:
             self.stdout.write(self.style.ERROR("No users found"))
@@ -32,8 +37,20 @@ class Command(BaseCommand):
             self.set_properties_owner(user, user_properties)
             start_index = end_index
     
+    def generate_fake_users(self):
+        for _ in range(9):
+            first_name = fake.first_name()
+            user = User.objects.create(
+                username=f"{first_name}123",
+                first_name=first_name,
+                last_name=fake.last_name(),
+                email=fake.email(),
+            )
+            user.set_password("cogent123")
+        
     def set_properties_owner(self, user, properties):
         for property in properties:
             property.owner = user
             property.save()
             self.stdout.write(self.style.SUCCESS(f"Assigned {user.username} as owner of property {property.id}"))
+

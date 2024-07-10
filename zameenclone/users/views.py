@@ -11,7 +11,7 @@ def login_user(request):
             response = redirect('property/marketplace')
         else:
             response = render(request, "users/login.html", {"message": "Invalid username or password"})
-    else:
+    elif request.method == "GET":
         response = render(request, "users/login.html", {})
         
     return response
@@ -20,7 +20,7 @@ def logout_user(request):
     if request.method == "POST":
         logout(request)
         response = redirect('login')
-    else:
+    elif request.method == "GET":
         response = redirect('property/marketplace')
     
     return response
