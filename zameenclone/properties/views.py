@@ -27,12 +27,9 @@ def properties(request):
             properties = Property.objects.filter(Q(title__contains=request.POST.get("search")) | Q(location__contains=request.POST.get("search")))
         elif request.POST.get("property_id"):
             property_instance = Property.objects.get(pk=request.POST["property_id"])
-            if property_instance:
-                PropertyImages.objects.filter(property=property_instance).delete()
-                PropertyAmenity.objects.filter(property=property_instance).delete()
-                property_instance.delete()
-                properties = Property.objects.filter(owner=request.user)
-
+            property_instance.is_active = False
+            property_instance.save()
+            properties = Property.objects.filter(owner=request.user, is_active=True) if property_instance else None
     else:
         properties = Property.objects.filter(owner=request.user)
     

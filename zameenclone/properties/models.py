@@ -19,6 +19,7 @@ class Property(TimeStampedModel):
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=255, default="house")
     whatsapp_number = models.CharField(max_length=13)
+    is_active = models.BooleanField(default=True)
     
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name='amenities')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
