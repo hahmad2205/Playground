@@ -1,3 +1,4 @@
 django 5.0.6
 django_extensions 
 django_filter 24.2
+faker

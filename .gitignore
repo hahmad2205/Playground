@@ -8,3 +8,4 @@ zameenclone/properties/management/commands/__pycache__
 zameenclone/data
 __pycache__/
 *.pyc
+*.min.js
