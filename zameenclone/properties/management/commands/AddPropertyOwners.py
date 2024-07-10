@@ -53,3 +53,4 @@ class Command(BaseCommand):
             property.owner = user
             property.save()
             self.stdout.write(self.style.SUCCESS(f"Assigned {user.username} as owner of property {property.id}"))
+
