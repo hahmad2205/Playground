@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
@@ -53,4 +53,12 @@ def properties(request):
             "path": request.path,
             "filter": PropertyFilter(request.GET, queryset=queryset)
         }
+    )
+    
+@login_required
+def property_detail(request, property_id):
+    property = get_object_or_404(Property, id=property_id)
+    
+    return render(
+        request, "properties/property_details.html", {"property": property}
     )
