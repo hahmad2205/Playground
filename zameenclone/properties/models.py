@@ -2,14 +2,13 @@ from django.db import models
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
 
-from django_extensions.db.models import TimeStampedModel
 import django_filters
 
-from core.models import AmenityOption
+from core.models import AmenityOption, OnDeleteMixin
 
 User = get_user_model()
 
-class Property(TimeStampedModel):
+class Property(OnDeleteMixin):
     area = models.PositiveSmallIntegerField()
     description = models.TextField()
     header = models.TextField()
@@ -21,7 +20,6 @@ class Property(TimeStampedModel):
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=255, default="house")
     whatsapp_number = models.CharField(max_length=13)
-    is_active = models.BooleanField(default=True)
     
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name="amenities")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
@@ -66,7 +64,7 @@ class PropertyFilter(django_filters.FilterSet):
         fields = ["price", "number_of_bed", "number_of_bath", "area"]
 
 
-class PropertyImages(TimeStampedModel):
+class PropertyImages(OnDeleteMixin):
     image_url = models.TextField()
     image = models.FileField()
     
@@ -76,7 +74,7 @@ class PropertyImages(TimeStampedModel):
         return self.property.title
 
 
-class PropertyOffers(TimeStampedModel):
+class PropertyOffers(OnDeleteMixin):
     price = models.PositiveIntegerField()
     
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
@@ -86,7 +84,7 @@ class PropertyOffers(TimeStampedModel):
         return f"{self.property.title} - {self.price}"
 
 
-class PropertyAmenity(TimeStampedModel):
+class PropertyAmenity(OnDeleteMixin):
     value = models.PositiveIntegerField(null=True, blank=True)
     
     amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name="options")
