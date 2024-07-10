@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
-from .models import Property
+from .models import Property, PropertyImages, PropertyAmenity
 from core.utils import create_pagination
 
 @login_required
@@ -33,4 +33,12 @@ def properties(request):
             "properties": create_pagination(properties, request),
             "path": request.path
         }
+    )
+    
+@login_required
+def property_detail(request, property_id):
+    property = get_object_or_404(Property, id=property_id)
+    
+    return render(
+        request, "properties/property_details.html", {"property": property,}
     )

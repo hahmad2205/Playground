@@ -30,28 +30,27 @@
   </form>
 
   {% for property in properties %}
-    <div class="card mb-3 mx-auto" style="max-width: 70%;">
-      <div class="row g-0 justify-content-between">
-        <div class="col-md-3">
-          <img src="{{ property.image_url }}" class="img-fluid rounded-start property-image" alt="Property Image" style="height: 250px; width: 100%">
-        </div>
-        <div class="col-md-9">
-          <div class="card-body">
-            <span class="row">
-              <h4 class="card-title col-8 fs-3">{{ property.property.title }}</h4>
-              <h5 class="col-3 ms-auto fs-4">PKR {{ property.property.price }}</h5>
-            </span>
-            <p class="card-text fs-5">{{ property.property.header }}</p>
-            <p class="card-text fs-6"><small class="text-body-secondary">Beds {{ property.property.number_of_bed }}  Baths {{ property.property.number_of_bath }}</small></p>
+    <a href="{% url 'property_detail' property.property.id %}">
+      <div class="card mb-3 mx-auto" style="max-width: 70%;">
+        <div class="row g-0 justify-content-between">
+          <div class="col-md-3">
+            <img src="{{ property.image_url }}" class="img-fluid rounded-start property-image" alt="Property Image" style="height: 250px; width: 100%">
+          </div>
+          <div class="col-md-9">
+            <div class="card-body">
+              <span class="row">
+                <h4 class="card-title col-8 fs-3">{{ property.property.title }}</h4>
+                <h5 class="col-3 ms-auto fs-4">PKR {{ property.property.price }}</h5>
+              </span>
+              <p class="card-text fs-5">{{ property.property.header }}</p>
+              <p class="card-text fs-6"><small class="text-body-secondary">Beds {{ property.property.number_of_bed }}  Baths {{ property.property.number_of_bath }}</small></p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </a>
   {% endfor %}
 </div>
-
-
-
 
 <div class="d-flex justify-content-center">
   {% if properties.has_previous %}
