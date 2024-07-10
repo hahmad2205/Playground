@@ -42,7 +42,16 @@
               <h5 class="col-3 ms-auto fs-4">PKR {{ property.property.price }}</h5>
             </span>
             <p class="card-text fs-5">{{ property.property.header }}</p>
-            <p class="card-text fs-6"><small class="text-body-secondary">Beds {{ property.property.number_of_bed }}  Baths {{ property.property.number_of_bath }}</small></p>
+            <div class="d-flex justify-content-between">
+              <p class="card-text fs-6"><small class="text-body-secondary">Beds {{ property.property.number_of_bed }}  Baths {{ property.property.number_of_bath }}</small></p>
+              {% if path == "/property/properties/" %}
+                <form action="" method="POST">
+                  {% csrf_token %}
+                  <input type="hidden" name="property_id" value="{{ property.property.id }}"/>
+                  <input type="submit" class="btn btn-danger" value="Delete"/>
+                </form>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
