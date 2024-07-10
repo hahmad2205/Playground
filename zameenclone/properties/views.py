@@ -40,5 +40,5 @@ def property_detail(request, property_id):
     property = get_object_or_404(Property, id=property_id)
     
     return render(
-        request, "properties/property_details.html", {"property": property,}
+        request, "properties/property_details.html", {"property": property}
     )
