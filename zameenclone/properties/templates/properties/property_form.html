@@ -2,48 +2,95 @@
 
 {% block listings %}
     <h2>Add Property</h2>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="property-form">
         {% csrf_token %}
         {{ property_form.as_p }}
 
         <h3>Images</h3>
-        {{ image_formset.management_form }}
-        {% for form in image_formset %}
-            {{ form.as_p }}
-        {% endfor %}
+        <div id="image-formset">
+            {{ image_formset.management_form }}
+            {% for form in image_formset %}
+                <div class="image-form">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-image-form" class="btn btn-secondary">Add Image</button>
 
         <h3>Amenities</h3>
-        {{ amenity_formset.management_form }}
-        {% for form in amenity_formset %}
-            {{ form.as_p }}
-        {% endfor %}
+        <div id="amenity-formset">
+            {{ amenity_formset.management_form }}
+            {% for form in amenity_formset %}
+                <div class="amenity-form">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-amenity-form" class="btn btn-secondary">Add Amenity</button>
 
-        <button type="submit">Save</button>
+        <button type="submit" class="btn btn-primary">Save</button>
     </form>
-
-{% endblock listings%}
+{% endblock listings %}
 
 {% block script %}
-<script>    
-$(document).ready(function() {
-    $('.amenity-dropdown').change(function() {
-        var $this = $(this);
-        var amenityID = $this.val();
-        console.log(amenityID);  // Check if amenityID is logged correctly
-        var $optionDropdown = $this.closest('form').find('.amenity-option-dropdown');
-        $.ajax({
-            url: '{% url "core:get_amenity_options" %}',
-            data: {
-                'amenity_id': amenityID
-            },
-            success: function(data) {
-                $optionDropdown.html(data);
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                console.error('AJAX Error:', textStatus, errorThrown);
-            }
+<script>
+    $(document).ready(function() {
+        function updateAmenityOptions($amenityDropdown) {
+            var amenityID = $amenityDropdown.val();
+            var $form = $amenityDropdown.closest('.amenity-form');
+            var $optionDropdown = $form.find('.amenity-option-dropdown');
+    
+            $.ajax({
+                url: '{% url "core:get_amenity_options" %}',
+                data: {
+                    'amenity_id': amenityID
+                },
+                success: function(data) {
+                    $optionDropdown.html(data);
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error('AJAX Error:', textStatus, errorThrown);
+                }
+            });
+        }
+    
+        $('#add-image-form').click(function() {
+            var formCount = $('#id_image_formset-TOTAL_FORMS').val();
+            var $imageFormset = $('#image-formset');
+            var $newForm = $imageFormset.children('.image-form:first').clone(false).get(0);
+            $($newForm).find(':input').each(function() {
+                var name = $(this).attr('name').replace('-0-', '-' + formCount + '-');
+                var id = 'id_' + name;
+                $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            });
+            formCount++;
+            $('#id_image_formset-TOTAL_FORMS').val(formCount);
+            $imageFormset.append($newForm);
+        });
+    
+        $('#add-amenity-form').click(function() {
+            var formCount = $('#id_amenity_formset-TOTAL_FORMS').val();
+            var $amenityFormset = $('#amenity-formset');
+            var $newForm = $amenityFormset.children('.amenity-form:first').clone(false).get(0);
+            $($newForm).find(':input').each(function() {
+                var name = $(this).attr('name').replace('-0-', '-' + formCount + '-');
+                var id = 'id_' + name;
+                $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            });
+            formCount++;
+            $('#id_amenity_formset-TOTAL_FORMS').val(formCount);
+            $amenityFormset.append($newForm);
+            updateAmenityOptions($newForm.find('.amenity-dropdown'));
+        });
+    
+        $(document).on('change', '.amenity-dropdown', function() {
+            updateAmenityOptions($(this));
+        });
+    
+        $('.amenity-dropdown').each(function() {
+            updateAmenityOptions($(this));
         });
     });
-    });
-</script
+    
+</script>
 {% endblock script %}

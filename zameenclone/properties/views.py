@@ -41,30 +41,29 @@ def properties(request):
 
 @login_required
 def add_property(request):
-    PropertyImageFormSet = modelformset_factory(PropertyImages, form=PropertyImagesForm, extra=3)
-    PropertyAmenityFormSet = modelformset_factory(PropertyAmenity, form=PropertyAmenityForm, extra=3)
-
+    PropertyImageFormSet = modelformset_factory(PropertyImages, form=PropertyImagesForm, extra=1)
+    PropertyAmenityFormSet = modelformset_factory(PropertyAmenity, form=PropertyAmenityForm, extra=1)
+    
     if request.method == 'POST':
         property_form = PropertyForm(request.POST)
         image_formset = PropertyImageFormSet(request.POST, request.FILES, queryset=PropertyImages.objects.none())
         amenity_formset = PropertyAmenityFormSet(request.POST, queryset=PropertyAmenity.objects.none())
-
         if property_form.is_valid() and image_formset.is_valid() and amenity_formset.is_valid():
             property_instance = property_form.save(commit=False)
             property_instance.owner = request.user
             property_instance.save()
-            
-            for form in image_formset.cleaned_data:
-                PropertyImages(
-                    property=property_instance, image=form['image']
-                ).save() if form else None
-                
-            for form in amenity_formset.cleaned_data:
-                property_amenity, created = AmenityOption.objects.get(id=form['amenity_option'])
-                PropertyAmenity(
-                    property=property_instance, value=form['value'],
-                    amenity_option=property_amenity,
-                ).save() if form else None
+
+            for form in image_formset:
+                if form.cleaned_data:
+                    PropertyImages(property=property_instance, image=form.cleaned_data['image']).save()
+
+            for form in amenity_formset:
+                if form.cleaned_data:
+                    PropertyAmenity(
+                        property=property_instance,
+                        value=form.cleaned_data.get('value'),
+                        amenity=form.cleaned_data['amenity'],
+                    ).save()
 
             return redirect('properties')
     else:

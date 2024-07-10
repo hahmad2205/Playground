@@ -17,15 +17,25 @@ class PropertyImagesForm(forms.ModelForm):
         fields = ['image']
 
 class PropertyAmenityForm(forms.ModelForm):
-    amenity = forms.ModelChoiceField(queryset=Amenity.objects.all(), label="Amenity")
-    amenity_option = forms.ModelChoiceField(queryset=AmenityOption.objects.none(), label="Amenity Option")
+    amenity_type = forms.ModelChoiceField(queryset=Amenity.objects.all(), label="Amenity")
+    amenity = forms.ModelChoiceField(queryset=AmenityOption.objects.none(), label="Amenity Option")
     value = forms.IntegerField(required=False)
 
     class Meta:
         model = PropertyAmenity
-        fields = ['amenity', 'amenity_option', 'value']
+        fields = ['amenity_type', 'amenity', 'value']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['amenity'].widget.attrs.update({'class': 'amenity-dropdown'})
-        self.fields['amenity_option'].widget.attrs.update({'class': 'amenity-option-dropdown'})
+        self.fields['amenity_type'].widget.attrs.update({'class': 'amenity-dropdown'})
+        self.fields['amenity'].widget.attrs.update({'class': 'amenity-option-dropdown'})
+        print(self.data)
+        if 'amenity_type' in self.data:
+            try:
+                self.fields['amenity'].queryset = AmenityOption.objects.filter(amenity=self.data.get('amenity_type'))
+            except (ValueError, TypeError):
+                self.fields['amenity'].queryset = AmenityOption.objects.none()
+        elif self.instance.pk:
+            self.fields['amenity'].queryset = self.instance.amenity.options.all()
+        else:
+            self.fields['amenity'].queryset = AmenityOption.objects.none()
