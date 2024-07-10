@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 
 def login_user(request):
     if request.user.is_authenticated:
-        response = redirect('property/')
+        response = redirect('property/marketplace')
     elif request.method == "POST":
         user = authenticate(request, username=request.POST.get("username"), password=request.POST.get("password"))
         if user is not None:
