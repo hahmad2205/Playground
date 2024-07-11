@@ -14,8 +14,9 @@ class PropertyForm(forms.ModelForm):
 class PropertyImagesForm(forms.ModelForm):
     class Meta:
         model = PropertyImages
-        fields = ['image']
-
+        fields = ['image_url', 'image']
+        widgets = {'image_url': forms.HiddenInput()}
+        
 class PropertyAmenityForm(forms.ModelForm):
     amenity_type = forms.ModelChoiceField(queryset=Amenity.objects.all(), label="Amenity")
     amenity = forms.ModelChoiceField(queryset=AmenityOption.objects.none(), label="Amenity Option")

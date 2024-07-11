@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Prefetch
 from django_extensions.db.models import TimeStampedModel
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from core.models import AmenityOption
 
@@ -43,11 +44,16 @@ class Property(TimeStampedModel):
         
 
 class PropertyImages(TimeStampedModel):
-    image_url = models.TextField()
-    image = models.FileField()
+    image_url = models.URLField(blank=True, null=True)
+    image = models.ImageField(upload_to='property_images/')
     
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
     
+    def save(self, *args, **kwargs):
+        if self.image and not self.image_url:
+            self.image_url = f"{settings.MEDIA_ROOT}/property_images/{self.image.name}"
+        super().save(*args, **kwargs)
+        
     def __str__(self):
         return self.property.title
 

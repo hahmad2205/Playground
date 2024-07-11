@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.forms import modelformset_factory
+from django.conf import settings
 
 
 from .forms import PropertyForm, PropertyImagesForm, PropertyAmenityForm
@@ -48,7 +49,9 @@ def add_property(request):
         property_form = PropertyForm(request.POST)
         image_formset = PropertyImageFormSet(request.POST, request.FILES, queryset=PropertyImages.objects.none())
         amenity_formset = PropertyAmenityFormSet(request.POST, queryset=PropertyAmenity.objects.none())
-        
+             
+        if not image_formset.is_valid():
+            print(image_formset.errors)
         if property_form.is_valid() and image_formset.is_valid() and amenity_formset.is_valid():
             property_instance = property_form.save(commit=False)
             property_instance.owner = request.user
@@ -56,7 +59,9 @@ def add_property(request):
 
             for form in image_formset:
                 if form.cleaned_data:
-                    PropertyImages(property=property_instance, image=form.cleaned_data['image']).save()
+                    image_instance = form.save(commit=False)
+                    image_instance.property = property_instance
+                    image_instance.save()
 
             for form in amenity_formset:
                 if form.cleaned_data:
@@ -65,9 +70,9 @@ def add_property(request):
                         value=form.cleaned_data.get('value'),
                         amenity=form.cleaned_data['amenity'],
                     ).save()
-
+            
             response = redirect('properties')
-    else:
+    elif request.method == "GET":
         property_form = PropertyForm()
         image_formset = PropertyImageFormSet(queryset=PropertyImages.objects.none())
         amenity_formset = PropertyAmenityFormSet(queryset=PropertyAmenity.objects.none())
