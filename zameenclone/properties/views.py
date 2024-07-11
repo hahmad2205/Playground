@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
-from .models import Property,PropertyFilter
+from .models import Property, PropertyFilter, PropertyOffers
 from .forms import OfferForm
 from core.utils import create_pagination
 
@@ -84,3 +84,31 @@ def create_offer(request, property_id):
     return render(
         request, "properties/create_offers.html", {"offer_form":offer_form}
     )
+
+@login_required
+def view_incoming_offers(request):
+    if request.method == "GET":
+        properties = Property.objects.filter(owner=request.user, is_active=True).prefetch_related('offers')
+        active_offers = [
+            offer 
+            for property in properties 
+            for offer in property.offers.filter(is_active=True)
+        ]
+        
+        return render(
+            request, "properties/view_offers.html",
+            {"offers": active_offers, "path": request.path}
+        )
+
+@login_required
+def view_created_offer(request):
+    if request.method == "GET":
+        return render(
+            request, "properties/view_offers.html",
+            {
+                "offers": PropertyOffers.objects.filter(
+                    is_active=True, offered_by=request.user
+                ),
+                "path": request.path
+            }
+        )

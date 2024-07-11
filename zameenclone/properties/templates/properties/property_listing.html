@@ -10,6 +10,14 @@
     <a href="/properties/marketplace" class="me-3">
       <button type="button" class="btn btn-primary">Marketplace listings</button>
     </a>
+
+    <a href="{% url 'view_incoming_offers' %}" class="me-3">
+      <button type="button" class="btn btn-primary">View incoming offers</button>
+    </a>
+
+    <a href="{% url 'view_created_offer' %}" class="me-3">
+      <button type="button" class="btn btn-primary">View created offers</button>
+    </a>
   {% endif %}
 
   <form action="{% url 'logout' %}" method="POST">

@@ -1,0 +1,23 @@
+{% extends "properties/base_listing.html" %}
+
+{% block listings %}
+
+    {% for offer in offers %}
+        <div class="ms-3 mt-3 border border-2 p-2">
+            <p>
+                <b>Offered price: </b>{{offer.price}}
+            </p>
+
+            {% if path == "/properties/view_incoming_offers" %}
+            <p>
+                <b>Offered By: </b>{{offer.offered_by}}
+            </p>
+            {% elif path == "/properties/view_created_offers" %}
+            <p>
+                <b>Offered To: </b>{{offer.property}}
+            </p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+{% endblock listings %}
