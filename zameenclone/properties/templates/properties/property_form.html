@@ -55,7 +55,6 @@
         }
     
         $('#add-image-form').click(function() {
-            console.log("HEHEHL")
             var formCount = $('#image-formset #id_form-TOTAL_FORMS').val();
             var $imageFormset = $('#image-formset');
             var $newForm = $imageFormset.children('.image-form:first').clone(false).get(0);
@@ -65,8 +64,6 @@
                 $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
             });
             formCount++;
-
-            console.log({formCount})
             $('#image-formset #id_form-TOTAL_FORMS').val(formCount);
             $imageFormset.append($newForm);
         });
@@ -81,20 +78,13 @@
                 $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
             });
             formCount++;
-            console.log({formCount})
             $('#amenity-formset #id_form-TOTAL_FORMS').val(formCount);
             $amenityFormset.append($newForm);
-            updateAmenityOptions($newForm.find('.amenity-dropdown'));
         });
     
         $(document).on('change', '.amenity-dropdown', function() {
             updateAmenityOptions($(this));
         });
-    
-        {% comment %} $('.amenity-dropdown').each(function() {
-            updateAmenityOptions($(this));
-        }); {% endcomment %}
     });
-    
 </script>
 {% endblock script %}

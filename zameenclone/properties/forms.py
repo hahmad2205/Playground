@@ -38,14 +38,13 @@ class PropertyAmenityForm(forms.ModelForm):
                         highest_form_count = index
                 except ValueError:
                     pass
-        
-        for formCount in range(0,highest_form_count+1):
-            if f'form-{formCount}-amenity_type' in self.data:
-                try:
-                    self.fields['amenity'].queryset = AmenityOption.objects.filter(amenity=self.data.get(f'form-{formCount}-amenity_type'))
-                except (ValueError, TypeError):
-                    self.fields['amenity'].queryset = AmenityOption.objects.none()
-            elif self.instance.pk:
-                self.fields['amenity'].queryset = self.instance.amenity.options.all()
-            else:
+        if self.is_bound:
+            try:
+                amenity_type_id = int(self.data.get(self.add_prefix('amenity_type')))
+                self.fields['amenity'].queryset = AmenityOption.objects.filter(amenity_id=amenity_type_id)
+            except (ValueError, TypeError):
                 self.fields['amenity'].queryset = AmenityOption.objects.none()
+        elif self.instance.pk:
+            self.fields['amenity'].queryset = self.instance.amenity.options.all()
+        else:
+            self.fields['amenity'].queryset = AmenityOption.objects.none()
