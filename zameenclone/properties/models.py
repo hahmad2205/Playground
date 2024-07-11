@@ -51,7 +51,7 @@ class PropertyImages(TimeStampedModel):
     
     def save(self, *args, **kwargs):
         if self.image and not self.image_url:
-            self.image_url = f"{settings.MEDIA_ROOT}/property_images/{self.image.name}"
+            self.image_url = f"{settings.MEDIA_URL}property_images/{self.image.name}"
         super().save(*args, **kwargs)
         
     def __str__(self):
