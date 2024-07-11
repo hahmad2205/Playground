@@ -6,6 +6,9 @@ class SoftdeleteModelMixin(TimeStampedModel):
     
     class Meta:
         abstract = True
+        
+    def on_delete(self):
+        self.is_active = False
 
 
 class Amenity(SoftdeleteModelMixin):

@@ -41,15 +41,12 @@ def properties(request):
             )
         elif request.POST.get("property_id"):
             property_instance = get_object_or_404(Property, pk=request.POST["property_id"], is_active=True)
-            property_instance.is_active = False
+            property_instance.on_delete()
             property_instance.save()
-            property_instance.images.all().update(is_active=False)
-            property_instance.amenities.all().update(is_active=False)
-            property_instance.offers.all().update(is_active=False)
-            properties = queryset
+            properties = queryset.filter(is_active=True)
     elif request.method == "GET":
         properties = PropertyFilter(request.GET, queryset=queryset).qs if request.GET.get("price") else queryset
-        
+    
     return render(
         request, "properties/property_listing.html",
         {
@@ -104,7 +101,7 @@ def view_incoming_offers(request):
 @login_required
 def view_created_offer(request):
     if request.method == "GET":
-        response = render(
+        return render(
             request, "properties/view_offers.html",
             {
                 "offers": PropertyOffers.objects.filter(
@@ -113,24 +110,6 @@ def view_created_offer(request):
                 "path": request.path
             }
         )
-    elif request.method == "POST":
-        offer_id = request.POST.get("offer_id", None)
-        offer = get_object_or_404(
-            PropertyOffers, pk=offer_id, is_active=True, state="pending"
-        )
-        offer.is_active = False
-        offer.save()
-        response = render(
-                request, "properties/view_offers.html",
-                {
-                    "offers": PropertyOffers.objects.filter(
-                        is_active=True, offered_by=request.user
-                    ),
-                    "path": request.path
-                }
-            )
-    
-    return response
         
 @login_required
 def change_offer_state(request, offer_id):
@@ -150,3 +129,14 @@ def change_offer_state(request, offer_id):
             messages.success(request, "Offer has been rejected.")
             
     return redirect('view_incoming_offers')
+
+@login_required
+def withdraw_offer(request, offer_id):
+    if request.method == "POST":
+        offer = get_object_or_404(
+                PropertyOffers, pk=offer_id, is_active=True, state="pending"
+            )
+        offer.is_active = False
+        offer.save()
+    
+    return redirect("view_created_offer")

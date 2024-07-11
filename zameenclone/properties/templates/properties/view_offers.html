@@ -35,7 +35,7 @@
                 </form>
                 
                 {% elif path == "/properties/view_created_offers" %}
-                    <form action="" method="POST">
+                    <form action="{% url 'withdraw_offer' offer.id%}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="offer_id" value="{{offer.id}}"/>
                         <input type="submit" class="btn btn-primary" value="Withdraw offer"/>

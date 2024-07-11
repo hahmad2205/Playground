@@ -28,6 +28,12 @@ class Property(SoftdeleteModelMixin):
     def get_first_image(self):
         return self.images.first()
     
+    def on_delete(self):
+        super().on_delete()
+        self.images.all().update(is_active=False)
+        self.amenities.all().update(is_active=False)
+        self.offers.all().update(is_active=False)
+    
     @classmethod
     def get_images_from_properties(cls, properties):
         prefetch_images = Prefetch("images", queryset=PropertyImages.objects.all().order_by("pk"))
@@ -89,6 +95,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     def to_state_accepted(self):
         self.property.is_active = False
         return "Offer switched to accepted!"
+    
     @transition(field=state, source="pending", target="rejected")
     def to_state_rejected(self):
         return "Offer switched to rejected!"
