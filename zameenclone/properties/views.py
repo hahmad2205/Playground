@@ -44,6 +44,7 @@ def add_property(request):
     PropertyImageFormSet = modelformset_factory(PropertyImages, form=PropertyImagesForm, extra=1)
     PropertyAmenityFormSet = modelformset_factory(PropertyAmenity, form=PropertyAmenityForm, extra=1)
     
+    
     if request.method == 'POST':
         property_form = PropertyForm(request.POST)
         image_formset = PropertyImageFormSet(request.POST, request.FILES, queryset=PropertyImages.objects.none())
@@ -52,6 +53,7 @@ def add_property(request):
             property_instance = property_form.save(commit=False)
             property_instance.owner = request.user
             property_instance.save()
+            print("/////////////////////////////////////////////////////////////////////////////////////////////////")
 
             for form in image_formset:
                 if form.cleaned_data:

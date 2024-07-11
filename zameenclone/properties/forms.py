@@ -29,13 +29,23 @@ class PropertyAmenityForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['amenity_type'].widget.attrs.update({'class': 'amenity-dropdown'})
         self.fields['amenity'].widget.attrs.update({'class': 'amenity-option-dropdown'})
-        print(self.data)
-        if 'amenity_type' in self.data:
-            try:
-                self.fields['amenity'].queryset = AmenityOption.objects.filter(amenity=self.data.get('amenity_type'))
-            except (ValueError, TypeError):
+        highest_form_count = 0
+        for key in self.data.keys():
+            if key.startswith('form-') and '-amenity' in key:
+                try:
+                    index = int(key.split('-')[1])
+                    if index > highest_form_count:
+                        highest_form_count = index
+                except ValueError:
+                    pass
+        
+        for formCount in range(0,highest_form_count+1):
+            if f'form-{formCount}-amenity_type' in self.data:
+                try:
+                    self.fields['amenity'].queryset = AmenityOption.objects.filter(amenity=self.data.get(f'form-{formCount}-amenity_type'))
+                except (ValueError, TypeError):
+                    self.fields['amenity'].queryset = AmenityOption.objects.none()
+            elif self.instance.pk:
+                self.fields['amenity'].queryset = self.instance.amenity.options.all()
+            else:
                 self.fields['amenity'].queryset = AmenityOption.objects.none()
-        elif self.instance.pk:
-            self.fields['amenity'].queryset = self.instance.amenity.options.all()
-        else:
-            self.fields['amenity'].queryset = AmenityOption.objects.none()

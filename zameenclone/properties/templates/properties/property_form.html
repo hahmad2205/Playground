@@ -55,7 +55,8 @@
         }
     
         $('#add-image-form').click(function() {
-            var formCount = $('#id_image_formset-TOTAL_FORMS').val();
+            console.log("HEHEHL")
+            var formCount = $('#image-formset #id_form-TOTAL_FORMS').val();
             var $imageFormset = $('#image-formset');
             var $newForm = $imageFormset.children('.image-form:first').clone(false).get(0);
             $($newForm).find(':input').each(function() {
@@ -64,12 +65,14 @@
                 $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
             });
             formCount++;
-            $('#id_image_formset-TOTAL_FORMS').val(formCount);
+
+            console.log({formCount})
+            $('#image-formset #id_form-TOTAL_FORMS').val(formCount);
             $imageFormset.append($newForm);
         });
     
         $('#add-amenity-form').click(function() {
-            var formCount = $('#id_amenity_formset-TOTAL_FORMS').val();
+            var formCount = $('#amenity-formset #id_form-TOTAL_FORMS').val();
             var $amenityFormset = $('#amenity-formset');
             var $newForm = $amenityFormset.children('.amenity-form:first').clone(false).get(0);
             $($newForm).find(':input').each(function() {
@@ -78,7 +81,8 @@
                 $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
             });
             formCount++;
-            $('#id_amenity_formset-TOTAL_FORMS').val(formCount);
+            console.log({formCount})
+            $('#amenity-formset #id_form-TOTAL_FORMS').val(formCount);
             $amenityFormset.append($newForm);
             updateAmenityOptions($newForm.find('.amenity-dropdown'));
         });
@@ -87,9 +91,9 @@
             updateAmenityOptions($(this));
         });
     
-        $('.amenity-dropdown').each(function() {
+        {% comment %} $('.amenity-dropdown').each(function() {
             updateAmenityOptions($(this));
-        });
+        }); {% endcomment %}
     });
     
 </script>
