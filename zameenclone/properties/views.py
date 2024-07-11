@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
 from .models import Property,PropertyFilter
+from .forms import OfferForm
 from core.utils import create_pagination
 
 @login_required
@@ -60,7 +61,26 @@ def properties(request):
 @login_required
 def property_detail(request, property_id):
     property = get_object_or_404(Property, id=property_id)
+    owner = True if property.owner == request.user else False
     
     return render(
-        request, "properties/property_details.html", {"property": property}
+        request, "properties/property_details.html", {"property": property, "owner":owner}
+    )
+
+@login_required
+def create_offer(request, property_id):
+    if request.method == "POST":
+        offer_form = OfferForm(request.POST)
+        
+        if offer_form.is_valid():
+            offer_instance = offer_form.save(commit=False)
+            offer_instance.offered_by = request.user
+            offer_instance.property = Property.objects.get(pk=property_id)
+            offer_instance.save()
+
+    elif request.method == "GET":
+        offer_form = OfferForm()
+    
+    return render(
+        request, "properties/create_offers.html", {"offer_form":offer_form}
     )
