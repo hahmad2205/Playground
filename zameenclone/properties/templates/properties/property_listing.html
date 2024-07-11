@@ -2,12 +2,12 @@
 
 {% block listings %}
 <div class="d-flex justify-content-end mb-3">
-  {% if path == "/property/marketplace/" %}
-    <a href="/property/properties" class="me-3">
+  {% if path == "/properties/marketplace/" %}
+    <a href="/properties/" class="me-3">
       <button type="button" class="btn btn-primary">My listings</button>
     </a>
   {% else %}
-    <a href="/property/marketplace" class="me-3">
+    <a href="/properties/marketplace" class="me-3">
       <button type="button" class="btn btn-primary">Marketplace listings</button>
     </a>
   {% endif %}
@@ -47,13 +47,21 @@
                             <h4 class="card-title col-8 fs-3">{{ property.property.title }}</h4>
                             <h5 class="col-3 ms-auto fs-4">PKR {{ property.property.price }}</h5>
                         </span>
+<<<<<<< HEAD
                         <p class="card-text fs-5">{{ vproperty.header }}</p>
+=======
+                        <p class="card-text fs-5">{{ property.property.header }}</p>
+>>>>>>> 1ada7196115eef636991b46fcaecf4f0664dc8e1
                         <div class="d-flex justify-content-between">
                             <div>
                                 <p class="card-text fs-6"><small class="text-body-secondary">Beds {{ property.property.number_of_bed }} Baths {{ property.property.number_of_bath }}</small></p>
                                 <p class="card-text fs-6"><small class="text-body-secondary">Area {{ property.property.area }} Marla</small></p>
                             </div>
+<<<<<<< HEAD
                             {% if path == "/property/properties/" %}
+=======
+                            {% if path == "/properties/" %}
+>>>>>>> 1ada7196115eef636991b46fcaecf4f0664dc8e1
                                 <form action="" method="POST">
                                     {% csrf_token %}
                                     <input type="hidden" name="property_id" value="{{ property.property.id }}"/>
