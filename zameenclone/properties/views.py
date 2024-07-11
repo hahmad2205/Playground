@@ -1,5 +1,6 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db.models import Q
 
 from .models import Property, PropertyFilter, PropertyOffers
@@ -92,7 +93,7 @@ def view_incoming_offers(request):
         active_offers = [
             offer 
             for property in properties 
-            for offer in property.offers.filter(is_active=True)
+            for offer in property.offers.filter(is_active=True, state="pending")
         ]
         
         return render(
@@ -103,12 +104,49 @@ def view_incoming_offers(request):
 @login_required
 def view_created_offer(request):
     if request.method == "GET":
-        return render(
+        response = render(
             request, "properties/view_offers.html",
             {
                 "offers": PropertyOffers.objects.filter(
-                    is_active=True, offered_by=request.user
+                    is_active=True, offered_by=request.user, state="pending"
                 ),
                 "path": request.path
             }
         )
+    elif request.method == "POST":
+        offer_id = request.POST.get("offer_id", None)
+        offer = get_object_or_404(
+            PropertyOffers, pk=offer_id, is_active=True, state="pending"
+        )
+        offer.is_active = False
+        offer.save()
+        response = render(
+                request, "properties/view_offers.html",
+                {
+                    "offers": PropertyOffers.objects.filter(
+                        is_active=True, offered_by=request.user
+                    ),
+                    "path": request.path
+                }
+            )
+    
+    return response
+        
+@login_required
+def change_offer_state(request, offer_id):
+    offer = get_object_or_404(PropertyOffers, pk=offer_id)
+    
+    if request.method == "POST":
+        action = request.POST.get("action")
+        
+        if action == "accept":
+            offer.to_state_accepted()
+            offer.save()
+            messages.success(request, "Offer has been accepted.")
+            
+        elif action == "reject":
+            offer.to_state_rejected()
+            offer.save()
+            messages.success(request, "Offer has been rejected.")
+            
+    return redirect('view_incoming_offers')

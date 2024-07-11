@@ -3,6 +3,7 @@ from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
 
 import django_filters
+from django_fsm import FSMField, transition
 
 from core.models import AmenityOption, SoftdeleteModelMixin
 
@@ -79,9 +80,18 @@ class PropertyOffers(SoftdeleteModelMixin):
     
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
+    state = FSMField(default="pending", protected=True)
     
     def __str__(self):
         return f"{self.property.title} - {self.price}"
+    
+    @transition(field=state, source="pending", target="accepted")
+    def to_state_accepted(self):
+        self.property.is_active = False
+        return "Offer switched to accepted!"
+    @transition(field=state, source="pending", target="rejected")
+    def to_state_rejected(self):
+        return "Offer switched to rejected!"
 
 
 class PropertyAmenity(SoftdeleteModelMixin):
