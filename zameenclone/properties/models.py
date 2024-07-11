@@ -4,11 +4,11 @@ from django.contrib.auth import get_user_model
 
 import django_filters
 
-from core.models import AmenityOption, OnDeleteMixin
+from core.models import AmenityOption, SoftdeleteModelMixin
 
 User = get_user_model()
 
-class Property(OnDeleteMixin):
+class Property(SoftdeleteModelMixin):
     area = models.PositiveSmallIntegerField()
     description = models.TextField()
     header = models.TextField()
@@ -64,7 +64,7 @@ class PropertyFilter(django_filters.FilterSet):
         fields = ["price", "number_of_bed", "number_of_bath", "area"]
 
 
-class PropertyImages(OnDeleteMixin):
+class PropertyImages(SoftdeleteModelMixin):
     image_url = models.TextField()
     image = models.FileField()
     
@@ -74,7 +74,7 @@ class PropertyImages(OnDeleteMixin):
         return self.property.title
 
 
-class PropertyOffers(OnDeleteMixin):
+class PropertyOffers(SoftdeleteModelMixin):
     price = models.PositiveIntegerField()
     
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
@@ -84,7 +84,7 @@ class PropertyOffers(OnDeleteMixin):
         return f"{self.property.title} - {self.price}"
 
 
-class PropertyAmenity(OnDeleteMixin):
+class PropertyAmenity(SoftdeleteModelMixin):
     value = models.PositiveIntegerField(null=True, blank=True)
     
     amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name="options")

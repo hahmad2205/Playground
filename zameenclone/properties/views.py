@@ -38,7 +38,7 @@ def properties(request):
                 Q(location__contains=search_item)
             )
         elif request.POST.get("property_id"):
-            property_instance = get_object_or_404(Property, pk=request.POST["property_id"])
+            property_instance = get_object_or_404(Property, pk=request.POST["property_id"], is_active=True)
             property_instance.is_active = False
             property_instance.save()
             property_instance.images.all().update(is_active=False)
