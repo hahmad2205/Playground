@@ -1,10 +1,21 @@
 {% extends "properties/base_listing.html" %}
 
 {% block listings %}
+<div class="d-flex justify-content-between mx-3 mt-5">
+  <div>
+    <h3>{{property.title}}</h3>
+    <h5>{{property.header}}</h5>
+  </div>
 
-<h3>{{property.title}}</h3>
-<h5>{{property.header}}</h5>
-<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+  {% if not owner %}
+    <div>
+      <a href="{% url 'create_offer' property.id%}">
+        <button class="btn btn-primary">Create Offer</button>
+      </a>
+    </div>
+  {% endif %}
+</div>
+<div id="carouselExample" class="carousel slide mx-3" data-bs-ride="carousel">
     <div class="carousel-inner">
       {% for image in property.images.all %}
       <div class="carousel-item {% if forloop.first %}active{% endif %}">
@@ -23,26 +34,28 @@
   </div>
 </div>
 
-<h4>Description</h4>
-<p>{{property.description}}</p>
-
-<h4>Details</h4>
-<div>
-    <div>Area = {{property.area}}</div>
-    <div>Location = {{property.location}}</div>
-    <div>purpose = {{property.purpose}}</div>
-    <div>Bath = {{property.number_of_bath}}</div>
-    <div>Bed = {{property.number_of_bed}}</div>
-    <div>Price = {{property.price}}</div>
-    <div>Contact = {{property.whatsapp_number}}</div>
+<div class="mx-5">
+  <h4>Description</h4>
+  <p>{{property.description}}</p>
+  
+  <h4>Details</h4>
+  <div>
+      <div>Area = {{property.area}}</div>
+      <div>Location = {{property.location}}</div>
+      <div>purpose = {{property.purpose}}</div>
+      <div>Bath = {{property.number_of_bath}}</div>
+      <div>Bed = {{property.number_of_bed}}</div>
+      <div>Price = {{property.price}}</div>
+      <div>Contact = {{property.whatsapp_number}}</div>
+  </div>
+  
+  <h4>Amenities</h4>
+  <ul class="list-group">
+      {% for amenity in property.amenities.all %}
+          <li class="list-group-item">
+              {{amenity.amenity.amenity.name}} - {{amenity.amenity.option}} {% if amenity.value != None %}- {{amenity.value}}{% endif %}
+          </li>
+      {% endfor %}
+  </ul>
 </div>
-
-<h4>Amenities</h4>
-<ul class="list-group">
-    {% for amenity in property.amenities.all %}
-        <li class="list-group-item">
-            {{amenity.amenity.amenity.name}} - {{amenity.amenity.option}} {% if amenity.value != None %}- {{amenity.value}}{% endif %}
-        </li>
-    {% endfor %}
-</ul>
 {% endblock listings %}

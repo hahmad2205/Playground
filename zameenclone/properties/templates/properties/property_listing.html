@@ -12,6 +12,13 @@
     </a>
     <a href="{% url 'add_property' %}" class="me-3">
       <button type="button" class="btn btn-primary">Add Property</button>
+
+    <a href="{% url 'view_property_offers' %}" class="me-3">
+      <button type="button" class="btn btn-primary">View incoming offers</button>
+    </a>
+
+    <a href="{% url 'view_created_offer' %}" class="me-3">
+      <button type="button" class="btn btn-primary">View created offers</button>
     </a>
   {% endif %}
 

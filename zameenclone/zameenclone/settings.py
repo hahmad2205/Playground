@@ -47,8 +47,9 @@ CUSTOM_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-     'django_extensions',
+    'django_extensions',
     'django_filters',
+    'django_fsm'
 ]
 
 INSTALLED_APPS = DEAFAULT_APPS + CUSTOM_APPS + THIRD_PARTY_APPS

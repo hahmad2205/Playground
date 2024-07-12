@@ -1,5 +1,5 @@
 from django import forms
-from .models import Property, PropertyImages, PropertyAmenity
+from .models import Property, PropertyImages, PropertyAmenity, PropertyOffers
 from core.models import Amenity, AmenityOption
 
 class PropertyForm(forms.ModelForm):
@@ -42,3 +42,11 @@ class PropertyAmenityForm(forms.ModelForm):
             self.fields['amenity'].queryset = self.instance.amenity.options.all()
         else:
             self.fields['amenity'].queryset = AmenityOption.objects.none()
+
+
+class OfferForm(forms.ModelForm):
+    price = forms.IntegerField()
+    
+    class Meta:
+        model = PropertyOffers
+        fields = ["price"]

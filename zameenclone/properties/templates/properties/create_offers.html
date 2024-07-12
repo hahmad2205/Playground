@@ -1,0 +1,11 @@
+{% extends "properties/base_listing.html" %}
+
+{% block listings %}
+    <h3>Create offer</h3>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="property_id" value="{{ property.property.id }}"/>                
+        {{offer_form.as_p}}
+        <button type="submit">Create offer</button>
+    </form>
+{% endblock listings %}

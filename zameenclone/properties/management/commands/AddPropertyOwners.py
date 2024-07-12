@@ -47,6 +47,7 @@ class Command(BaseCommand):
                 email=fake.email(),
             )
             user.set_password("cogent123")
+            user.save()
         
     def set_properties_owner(self, user, properties):
         for property in properties:
