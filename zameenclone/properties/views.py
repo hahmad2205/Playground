@@ -6,6 +6,7 @@ from django.db.models import Q
 from .models import Property, PropertyFilter, PropertyOffers
 from .forms import OfferForm
 from core.utils import create_pagination
+from .enums import MobileState
 
 @login_required
 def marketplace(request):
@@ -40,7 +41,9 @@ def properties(request):
                 Q(location__contains=search_item)
             )
         elif request.POST.get("property_id"):
-            get_object_or_404(Property, pk=request.POST["property_id"], is_active=True).save()
+            property = get_object_or_404(Property, pk=request.POST["property_id"], is_active=True)
+            property.on_delete()
+            property.save()
             properties = queryset
     elif request.method == "GET":
         properties = PropertyFilter(request.GET, queryset=queryset).qs if request.GET.get("price") else queryset
@@ -70,7 +73,9 @@ def create_offer(request, property_id):
         
         if offer_form.is_valid():
             offer = offer_form.save(commit=False)
-            offer.save(offered_by=request.user, property=property)
+            offer.offered_by = request.user
+            offer.property = property
+            offer.save() # save
 
     elif request.method == "GET":
         offer_form = OfferForm()
@@ -82,12 +87,7 @@ def create_offer(request, property_id):
 @login_required
 def view_property_offers(request):
     if request.method == "GET":
-        properties = Property.objects.filter(owner=request.user, is_active=True).prefetch_related('offers')
-        active_offers = [
-            offer 
-            for property in properties 
-            for offer in property.offers.filter(is_active=True, state="pending")
-        ]
+        active_offers = PropertyOffers.objects.filter(property__owner=request.user, is_active=True, state=MobileState.PENDING.value)
         
         return render(
             request, "properties/view_offers.html",
@@ -101,7 +101,7 @@ def view_created_offer(request):
             request, "properties/view_offers.html",
             {
                 "offers": PropertyOffers.objects.filter(
-                    is_active=True, offered_by=request.user, state="pending"
+                    is_active=True, offered_by=request.user, state=MobileState.PENDING.value
                 ),
                 "path": request.path
             }
@@ -115,24 +115,32 @@ def change_offer_state(request, offer_id):
         action = request.POST.get("action")
         
         if action == "accept":
-            offer.mark_accepted()
-            offer.save()
-            messages.success(request, "Offer has been accepted.")
+            if offer.state == MobileState.PENDING.value:
+                offer.mark_accepted()
+                offer.save()
+                messages.success(request, "Offer has been accepted.")
+            else:
+                messages.error(request, "Offer cannot be accepted in current state.")
             
         elif action == "reject":
-            offer.mark_rejected()
-            offer.save()
-            messages.success(request, "Offer has been rejected.")
-            
-    return redirect('view_incoming_offers')
+            if offer.state == MobileState.PENDING.value:
+                offer.mark_rejected()
+                offer.save()
+                messages.success(request, "Offer has been rejected.")
+            else:
+                messages.error(request, "Offer cannot be rejected in current state.")
+                
+        return redirect('view_property_offers')
+    
+    return render(request, "your_template.html", {"offer": offer})
 
 @login_required
 def withdraw_offer(request, offer_id):
     if request.method == "POST":
         offer = get_object_or_404(
-                    PropertyOffers, pk=offer_id, is_active=True, state="pending"
+                    PropertyOffers, pk=offer_id, is_active=True, state=MobileState.PENDING.value
                 )
         offer.is_active = False
-        offer.save()
+        offer.save() #delete
     
     return redirect("view_created_offer")

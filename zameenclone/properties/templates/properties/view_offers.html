@@ -9,7 +9,7 @@
                     <b>Offered price: </b>{{offer.price}}
                 </p>
             
-                {% if path == "/properties/view_incoming_offers" %}
+                {% if path == "/properties/view_property_offers" %}
                 <p>
                     <b>Offered By: </b>{{offer.offered_by}}
                 </p>
@@ -21,7 +21,7 @@
             </div>
 
             <div>
-                {% if path == "/properties/view_incoming_offers" %}
+                {% if path == "/properties/view_property_offers" %}
                 <form action="{% url 'change_offer_state' offer.id %}" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="accept"/>
