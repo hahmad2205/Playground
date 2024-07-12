@@ -33,6 +33,11 @@ class Property(SoftdeleteModelMixin):
         self.images.all().update(is_active=False)
         self.amenities.all().update(is_active=False)
         self.offers.all().update(is_active=False)
+        
+    def save(self, *args, **kwargs):
+        if self.is_active and self.pk:
+            self.on_delete()
+        super(Property, self).save(*args, **kwargs)
     
     @classmethod
     def get_images_from_properties(cls, properties):
@@ -91,13 +96,19 @@ class PropertyOffers(SoftdeleteModelMixin):
     def __str__(self):
         return f"{self.property.title} - {self.price}"
     
+    def save(self, *args, **kwargs):
+        if not self.pk:  # If the instance is being created
+            self.offered_by = kwargs.pop('offered_by', None)
+            self.property = kwargs.pop('property', None)
+        super(PropertyOffers, self).save(*args, **kwargs)
+            
     @transition(field=state, source="pending", target="accepted")
-    def to_state_accepted(self):
+    def mark_accepted(self):
         self.property.is_active = False
         return "Offer switched to accepted!"
     
     @transition(field=state, source="pending", target="rejected")
-    def to_state_rejected(self):
+    def mark_rejected(self):
         return "Offer switched to rejected!"
 
 

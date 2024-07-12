@@ -40,10 +40,8 @@ def properties(request):
                 Q(location__contains=search_item)
             )
         elif request.POST.get("property_id"):
-            property_instance = get_object_or_404(Property, pk=request.POST["property_id"], is_active=True)
-            property_instance.on_delete()
-            property_instance.save()
-            properties = queryset.filter(is_active=True)
+            get_object_or_404(Property, pk=request.POST["property_id"], is_active=True).save()
+            properties = queryset
     elif request.method == "GET":
         properties = PropertyFilter(request.GET, queryset=queryset).qs if request.GET.get("price") else queryset
     
@@ -59,22 +57,20 @@ def properties(request):
 @login_required
 def property_detail(request, property_id):
     property = get_object_or_404(Property, id=property_id)
-    owner = True if property.owner == request.user else False
     
     return render(
-        request, "properties/property_details.html", {"property": property, "owner":owner}
+        request, "properties/property_details.html", {"property": property, "owner":property.owner==request.user}
     )
 
 @login_required
 def create_offer(request, property_id):
     if request.method == "POST":
+        property = get_object_or_404(Property, pk=property_id)
         offer_form = OfferForm(request.POST)
         
         if offer_form.is_valid():
-            offer_instance = offer_form.save(commit=False)
-            offer_instance.offered_by = request.user
-            offer_instance.property = Property.objects.get(pk=property_id)
-            offer_instance.save()
+            offer = offer_form.save(commit=False)
+            offer.save(offered_by=request.user, property=property)
 
     elif request.method == "GET":
         offer_form = OfferForm()
@@ -84,7 +80,7 @@ def create_offer(request, property_id):
     )
 
 @login_required
-def view_incoming_offers(request):
+def view_property_offers(request):
     if request.method == "GET":
         properties = Property.objects.filter(owner=request.user, is_active=True).prefetch_related('offers')
         active_offers = [
@@ -119,12 +115,12 @@ def change_offer_state(request, offer_id):
         action = request.POST.get("action")
         
         if action == "accept":
-            offer.to_state_accepted()
+            offer.mark_accepted()
             offer.save()
             messages.success(request, "Offer has been accepted.")
             
         elif action == "reject":
-            offer.to_state_rejected()
+            offer.mark_rejected()
             offer.save()
             messages.success(request, "Offer has been rejected.")
             
@@ -134,8 +130,8 @@ def change_offer_state(request, offer_id):
 def withdraw_offer(request, offer_id):
     if request.method == "POST":
         offer = get_object_or_404(
-                PropertyOffers, pk=offer_id, is_active=True, state="pending"
-            )
+                    PropertyOffers, pk=offer_id, is_active=True, state="pending"
+                )
         offer.is_active = False
         offer.save()
     
