@@ -1,5 +1,5 @@
 from typing import Any
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
 
@@ -23,21 +23,19 @@ class Property(SoftdeleteModelMixin):
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=255, default="house")
     whatsapp_number = models.CharField(max_length=13)
+    is_sold = models.BooleanField(default=False)
     
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name="amenities")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
 
     def get_first_image(self):
         return self.images.first()
-    
-    def on_delete(self):
-        super().on_delete()
+        
+    def delete(self):
+        self.on_delete()
         self.images.all().update(is_active=False)
         self.amenities.all().update(is_active=False)
         self.offers.all().update(is_active=False)
-        
-    def delete(self, using: Any = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]:
-        self.on_delete()
         self.save()
         
     @classmethod
@@ -101,12 +99,20 @@ class PropertyOffers(SoftdeleteModelMixin):
         self.is_active = False
         self.save()
     
-    @transition(field='state', source=MobileState.PENDING, target=MobileState.ACCEPTED)
+    @transition(field="state", source=MobileState.PENDING, target=MobileState.ACCEPTED)
     def mark_accepted(self):
         self.property.is_active = False
+        other_offers = self.__class__.objects.filter(
+            property=self.property,
+            state=MobileState.PENDING
+        ).exclude(id=self.id)
+
+        with transaction.atomic():
+            other_offers.update(state=MobileState.REJECTED)
+
         return "Offer switched to accepted!"
     
-    @transition(field='state', source=MobileState.PENDING, target=MobileState.REJECTED)
+    @transition(field="state", source=MobileState.PENDING, target=MobileState.REJECTED)
     def mark_rejected(self):
         return "Offer switched to rejected!"
 
@@ -118,4 +124,3 @@ class PropertyAmenity(SoftdeleteModelMixin):
 
     def __str__(self):
         return f"{self.property} | ID: {self.id}"
-

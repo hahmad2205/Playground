@@ -10,13 +10,12 @@ from .enums import MobileState
 
 @login_required
 def marketplace(request):
-    queryset = Property.objects.filter(is_active=True)
+    queryset = Property.objects.filter(is_active=True, is_sold=False)
     if request.method == "POST":
         search_item = request.POST.get("search", "")
         properties = queryset.filter(
             Q(title__icontains=search_item) |
             Q(location__icontains=search_item),
-            is_active=True
         ) if search_item else queryset
     elif request.method == "GET":  
         properties = PropertyFilter(request.GET, queryset=queryset).qs
@@ -32,7 +31,7 @@ def marketplace(request):
 
 @login_required
 def properties(request):
-    queryset = Property.objects.filter(owner=request.user, is_active=True)
+    queryset = Property.objects.filter(owner=request.user, is_active=True, is_sold=False)
     search_item = request.POST.get("search", "")
     if request.method == "POST":
         if search_item:
@@ -41,7 +40,7 @@ def properties(request):
                 Q(location__contains=search_item)
             )
         elif request.POST.get("property_id"):
-            property = get_object_or_404(Property, pk=request.POST["property_id"], is_active=True)
+            property = get_object_or_404(Property, pk=request.POST["property_id"], is_active=True, is_sold=False)
             property.delete()
             properties = queryset
     elif request.method == "GET":
