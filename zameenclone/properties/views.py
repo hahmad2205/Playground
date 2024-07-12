@@ -2,9 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from django.forms import modelformset_factory
 
-from .models import Property, PropertyFilter, PropertyOffers
-from .forms import OfferForm
+from .forms import PropertyForm, PropertyImagesForm, PropertyAmenityForm, OfferForm
+from .models import Property, PropertyImages, PropertyAmenity, PropertyFilter, PropertyOffers
 from core.utils import create_pagination
 from .enums import MobileState
 
@@ -54,6 +55,50 @@ def properties(request):
             "filter": PropertyFilter(request.GET, queryset=queryset)
         }
     )
+
+@login_required
+def add_property(request):
+    PropertyImageFormSet = modelformset_factory(PropertyImages, form=PropertyImagesForm, extra=1)
+    PropertyAmenityFormSet = modelformset_factory(PropertyAmenity, form=PropertyAmenityForm, extra=1)
+
+    if request.method == 'POST':
+        property_form = PropertyForm(request.POST)
+        image_formset = PropertyImageFormSet(request.POST, request.FILES, queryset=PropertyImages.objects.none())
+        amenity_formset = PropertyAmenityFormSet(request.POST, queryset=PropertyAmenity.objects.none())
+             
+        if not image_formset.is_valid():
+            print(image_formset.errors)
+        if property_form.is_valid() and image_formset.is_valid() and amenity_formset.is_valid():
+            property_instance = property_form.save(commit=False)
+            property_instance.owner = request.user
+            property_instance.save()
+
+            for form in image_formset:
+                if form.cleaned_data:
+                    image_instance = form.save(commit=False)
+                    image_instance.property = property_instance
+                    image_instance.save()
+
+            for form in amenity_formset:
+                if form.cleaned_data:
+                    PropertyAmenity(
+                        property=property_instance,
+                        value=form.cleaned_data.get('value'),
+                        amenity=form.cleaned_data['amenity'],
+                    ).save()
+            
+            response = redirect('properties')
+    elif request.method == "GET":
+        property_form = PropertyForm()
+        image_formset = PropertyImageFormSet(queryset=PropertyImages.objects.none())
+        amenity_formset = PropertyAmenityFormSet(queryset=PropertyAmenity.objects.none())
+        response = render(request, 'properties/property_form.html', {
+            'property_form': property_form,
+            'image_formset': image_formset,
+            'amenity_formset': amenity_formset
+        })
+
+    return response
     
 @login_required
 def property_detail(request, property_id):

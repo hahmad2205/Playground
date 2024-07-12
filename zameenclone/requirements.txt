@@ -3,3 +3,4 @@ django_extensions
 django_filter 24.2
 django-fsm
 faker
+pillow
