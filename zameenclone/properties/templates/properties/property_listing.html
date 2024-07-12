@@ -3,14 +3,14 @@
 {% block listings %}
 <div class="d-flex justify-content-end mb-3">
   {% if path == "/properties/marketplace/" %}
-    <a href="/properties/" class="me-3">
+    <a href="{% url 'properties' %}" class="me-3">
       <button type="button" class="btn btn-primary">My listings</button>
     </a>
   {% else %}
-    <a href="/properties/marketplace" class="me-3">
+    <a href="{% url 'marketplace' %}" class="me-3">
       <button type="button" class="btn btn-primary">Marketplace listings</button>
     </a>
-    <a href="/property/add_property" class="me-3">
+    <a href="{% url 'add_property' %}" class="me-3">
       <button type="button" class="btn btn-primary">Add Property</button>
     </a>
   {% endif %}
