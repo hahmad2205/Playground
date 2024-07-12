@@ -42,8 +42,7 @@ def properties(request):
             )
         elif request.POST.get("property_id"):
             property = get_object_or_404(Property, pk=request.POST["property_id"], is_active=True)
-            property.on_delete()
-            property.save()
+            property.delete()
             properties = queryset
     elif request.method == "GET":
         properties = PropertyFilter(request.GET, queryset=queryset).qs if request.GET.get("price") else queryset
@@ -75,7 +74,7 @@ def create_offer(request, property_id):
             offer = offer_form.save(commit=False)
             offer.offered_by = request.user
             offer.property = property
-            offer.save() # save
+            offer.save()
 
     elif request.method == "GET":
         offer_form = OfferForm()
@@ -140,7 +139,6 @@ def withdraw_offer(request, offer_id):
         offer = get_object_or_404(
                     PropertyOffers, pk=offer_id, is_active=True, state=MobileState.PENDING.value
                 )
-        offer.is_active = False
-        offer.save() #delete
+        offer.delete()
     
     return redirect("view_created_offer")

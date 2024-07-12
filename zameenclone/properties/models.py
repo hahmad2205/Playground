@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
@@ -34,6 +35,10 @@ class Property(SoftdeleteModelMixin):
         self.images.all().update(is_active=False)
         self.amenities.all().update(is_active=False)
         self.offers.all().update(is_active=False)
+        
+    def delete(self, using: Any = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]:
+        self.on_delete()
+        self.save()
         
     @classmethod
     def get_images_from_properties(cls, properties):
@@ -91,7 +96,11 @@ class PropertyOffers(SoftdeleteModelMixin):
     
     def __str__(self):
         return f"{self.property.title} - {self.price}"
-            
+    
+    def delete(self, using: Any = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]:
+        self.is_active = False
+        self.save()
+    
     @transition(field='state', source=MobileState.PENDING, target=MobileState.ACCEPTED)
     def mark_accepted(self):
         self.property.is_active = False
