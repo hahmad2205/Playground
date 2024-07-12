@@ -11,11 +11,13 @@ class PropertyForm(forms.ModelForm):
             'type', 'whatsapp_number'
         ]
 
+
 class PropertyImagesForm(forms.ModelForm):
     class Meta:
         model = PropertyImages
         fields = ['image_url', 'image']
         widgets = {'image_url': forms.HiddenInput()}
+
         
 class PropertyAmenityForm(forms.ModelForm):
     amenity_type = forms.ModelChoiceField(queryset=Amenity.objects.all(), label="Amenity")
@@ -30,15 +32,6 @@ class PropertyAmenityForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['amenity_type'].widget.attrs.update({'class': 'amenity-dropdown'})
         self.fields['amenity'].widget.attrs.update({'class': 'amenity-option-dropdown'})
-        highest_form_count = 0
-        for key in self.data.keys():
-            if key.startswith('form-') and '-amenity' in key:
-                try:
-                    index = int(key.split('-')[1])
-                    if index > highest_form_count:
-                        highest_form_count = index
-                except ValueError:
-                    pass
         if self.is_bound:
             try:
                 amenity_type_id = int(self.data.get(self.add_prefix('amenity_type')))

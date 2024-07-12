@@ -76,4 +76,3 @@ class PropertyAmenity(TimeStampedModel):
 
     def __str__(self):
         return f"{self.property} | ID: {self.id}"
-

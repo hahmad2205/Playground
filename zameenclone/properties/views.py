@@ -2,12 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.forms import modelformset_factory
-from django.conf import settings
-
 
 from .forms import PropertyForm, PropertyImagesForm, PropertyAmenityForm
 from .models import Property, PropertyImages, PropertyAmenity
-from core.models import AmenityOption
 from core.utils import create_pagination
 
 @login_required
