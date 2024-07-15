@@ -1,4 +1,5 @@
 from django.urls import path
+
 from properties.views import simple_views
 from properties.views.api_views import *
 
