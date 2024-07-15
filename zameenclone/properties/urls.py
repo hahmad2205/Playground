@@ -15,6 +15,6 @@ urlpatterns = [
     path("offer/<int:offer_id>/withdraw/", simple_views.withdraw_offer, name="withdraw_offer"),
     
     # api views
-    path("api/marketplace/", api_views.api_marketplace, name="marketplace_api"),
-    path("api/", api_views.api_properties, name="properties")
+    path("api/marketplace/", api_views.Marketplace.as_view(), name="marketplace_api"),
+    path("api/", api_views.Properties.as_view(), name="properties")
 ]
