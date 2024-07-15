@@ -5,7 +5,7 @@ from ..models import Property
 from ..serializers import PropertySerializer
 
 
-class MarketplaceAPIView(APIView):
+class PropertyMarketplaceListAPIView(APIView):
     def get(self, request):
         properties = (
             Property.objects.filter(is_active=True, is_sold=False).
@@ -15,7 +15,7 @@ class MarketplaceAPIView(APIView):
         return Response(data=serializer.data)
 
 
-class PropertiesAPIView(APIView):
+class PropertyListAPIView(APIView):
     def get(self, request):
         properties = (
             Property.objects.filter(owner=request.user, is_active=True, is_sold=False).
