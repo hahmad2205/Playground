@@ -1,14 +1,6 @@
 from django.urls import path
 from . import views
 
-app_name = 'core'
-urlpatterns = [
-    path('get-amenity-options/', views.get_amenity_options, name='get_amenity_options'),
-]
-
-from django.urls import path
-from . import views
-
 urlpatterns = [
     path("marketplace/", views.marketplace, name="marketplace"),
     path("", views.properties, name="properties"),
@@ -19,12 +11,4 @@ urlpatterns = [
     path("created-offers/", views.view_created_offer, name="view_created_offer"),
     path('offer/<int:offer_id>/state/', views.change_offer_state, name='change_offer_state'),
     path("offer/<int:offer_id>/withdraw/", views.withdraw_offer, name="withdraw_offer")
-]
-
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path("login", views.login_user, name="login"),
-    path("logout/", views.logout_user, name="logout")
 ]
