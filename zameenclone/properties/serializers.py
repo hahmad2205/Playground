@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from .models import Property, PropertyImages, PropertyOffers, PropertyAmenity
+from core.serializers import AmenityOptionSerializer
 
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,6 +14,7 @@ class PropertyOfferSerializer(serializers.ModelSerializer):
         fields = ["id", "price", "offered_by"]
 
 class PropertyAmenitySerializer(serializers.ModelSerializer):
+    amenity = AmenityOptionSerializer(read_only=True)
     class Meta:
         model = PropertyAmenity
         fields = ["id", "amenity", "value"]
