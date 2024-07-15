@@ -30,7 +30,7 @@ class PropertySerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
     amenities = PropertyAmenitySerializer(many=True)
-    owner = serializers.SerializerMethodField()
+    owner = serializers.CharField(source="owner.get_full_name")
     
     class Meta:
         model = Property
@@ -41,6 +41,3 @@ class PropertySerializer(serializers.ModelSerializer):
             "is_sold"
         ]
 
-    def get_owner(self, obj):
-        return obj.owner.get_full_name()
-    
