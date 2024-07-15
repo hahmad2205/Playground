@@ -4,10 +4,10 @@ from django.contrib import messages
 from django.db.models import Q
 from django.forms import modelformset_factory
 
-from .forms import PropertyForm, PropertyImagesForm, PropertyAmenityForm, OfferForm
-from .models import Property, PropertyImages, PropertyAmenity, PropertyFilter, PropertyOffers
+from ..forms import PropertyForm, PropertyImagesForm, PropertyAmenityForm, OfferForm
+from ..models import Property, PropertyImages, PropertyAmenity, PropertyFilter, PropertyOffers
+from ..enums import MobileState
 from core.utils import create_pagination
-from .enums import MobileState
 
 @login_required
 def marketplace(request):

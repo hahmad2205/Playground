@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from .models import AmenityOption
+from ..models import AmenityOption
 
 def get_amenity_options(request):
     amenity_id = request.GET.get('amenity_id')
