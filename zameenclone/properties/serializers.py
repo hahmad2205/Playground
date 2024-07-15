@@ -14,18 +14,23 @@ class PropertyOfferSerializer(serializers.ModelSerializer):
         fields = ["id", "price", "offered_by"]
 
 class PropertyAmenitySerializer(serializers.ModelSerializer):
-    amenity = AmenityOptionSerializer(read_only=True)
+    amenity = AmenityOptionSerializer()
     class Meta:
         model = PropertyAmenity
         fields = ["id", "amenity", "value"]
     
 
 class PropertySerializer(serializers.ModelSerializer):
-    images = PropertyImageSerializer(many=True, read_only=True)
-    offers = PropertyOfferSerializer(many=True, read_only=True)
-    amenities = PropertyAmenitySerializer(many=True, read_only=True)
+    images = PropertyImageSerializer(many=True)
+    offers = PropertyOfferSerializer(many=True)
+    amenities = PropertyAmenitySerializer(many=True)
     owner = serializers.StringRelatedField(read_only=True)
     
     class Meta:
         model = Property
-        fields = "__all__"
+        fields = [
+            "id", "images", "offers", "amenities", "owner", "is_active",
+            "area", "description", "header", "location", "purpose", "title",
+            "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
+            "is_sold"
+        ]
