@@ -6,6 +6,7 @@ from ..models import Property
 from ..serializers import PropertySerializer
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def api_marketplace(request):
     properties = (
         Property.objects.all().
