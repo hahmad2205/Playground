@@ -4,3 +4,6 @@ django_filter 24.2
 django-fsm
 faker
 pillow
+
+djangorestframework 
+djangorestframework-simplejwt
