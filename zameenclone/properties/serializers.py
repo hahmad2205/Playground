@@ -37,3 +37,4 @@ class PropertySerializer(serializers.ModelSerializer):
 
     def get_owner(self, obj):
         return obj.owner.get_full_name()
+    
