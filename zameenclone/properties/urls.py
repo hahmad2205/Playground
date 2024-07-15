@@ -1,5 +1,6 @@
 from django.urls import path
 from properties.views import simple_views
+from properties.views import api_views
 
 urlpatterns = [
     # simple views
@@ -11,7 +12,9 @@ urlpatterns = [
     path("offers/", simple_views.view_property_offers, name="view_property_offers"),
     path("created-offers/", simple_views.view_created_offer, name="view_created_offer"),
     path('offer/<int:offer_id>/state/', simple_views.change_offer_state, name='change_offer_state'),
-    path("offer/<int:offer_id>/withdraw/", simple_views.withdraw_offer, name="withdraw_offer")
+    path("offer/<int:offer_id>/withdraw/", simple_views.withdraw_offer, name="withdraw_offer"),
     
     # api views
+    path("api/marketplace/", api_views.api_marketplace, name="marketplace_api"),
+    path("api/", api_views.api_properties, name="properties")
 ]
