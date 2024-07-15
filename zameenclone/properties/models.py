@@ -1,4 +1,3 @@
-from typing import Any
 from django.db import models, transaction
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
@@ -102,7 +101,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     def __str__(self):
         return f"{self.property.title} - {self.price}"
     
-    def delete(self, using: Any = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]:
+    def delete(self):
         self.is_active = False
         self.save()
     
