@@ -18,6 +18,10 @@ class PropertyMarketplaceListAPIView(APIView):
                 Q(title__icontains=query) | Q(location__icontains=query)
             )
             
+        filterset = PropertyFilter(request.GET, queryset=queryset)
+        if filterset.is_valid:
+            queryset = filterset.qs
+        
         serializer = PropertySerializer(queryset, many=True)
         return Response(data=serializer.data)
 
@@ -29,15 +33,16 @@ class PropertyListAPIView(APIView):
             Property.objects.filter(is_active=True, is_sold=False, owner=request.user).
             prefetch_related("images", "amenities", "offers", "owner")
         )
+        
         if query:
-            properties = (
-                queryset.filter(
-                    Q(title__icontains=query) | Q(location__icontains=query)
-                )
+            queryset = queryset.filter(
+                Q(title__icontains=query) | Q(location__icontains=query)
             )
-        else:
-            properties = queryset
+        
+        filterset = PropertyFilter(request.GET, queryset=queryset)
+        if filterset.is_valid:
+            queryset = filterset.qs
             
-        serializer = PropertySerializer(properties, many=True)
+        serializer = PropertySerializer(queryset, many=True)
         return Response(data=serializer.data)
 
