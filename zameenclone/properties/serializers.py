@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from core.serializers import AmenityOptionSerializer
+from users.serializers import UserSerializer
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -12,6 +13,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
+    offered_by = UserSerializer()
     
     class Meta:
         model = PropertyOffers

@@ -99,6 +99,10 @@ class PropertyImages(SoftdeleteModelMixin):
         return self.property.title
 
 
+class RetreiveOffersManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True, state=MobileState.PENDING.value)
+
 class PropertyOffers(SoftdeleteModelMixin):
     price = models.PositiveIntegerField()
     state = FSMField(default=MobileState.PENDING, protected=True, choices=MobileState.choices)
@@ -106,6 +110,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
     
+    objects = RetreiveOffersManager()
     def __str__(self):
         return f"{self.property.title} - {self.price}"
     
