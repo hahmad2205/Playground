@@ -6,6 +6,7 @@ from rest_framework import status
 
 from properties.models import Property, PropertyOffers
 from properties.serializers import PropertyOfferSerializer
+from properties.enums import MobileState
 from core.utils import get_serialized_data
 
 
@@ -35,14 +36,14 @@ class PropertyOfferCreateAPIView(APIView):
         
         if property.owner == request.user:
             return Response(
-                {'error': 'You cannot make an offer on your own property'},
+                {"error": "You cannot make an offer on your own property"},
                 status=status.HTTP_403_FORBIDDEN
             )
         
         price = request.data.get("price")
         if price is None:
             return Response(
-                {'error': 'Price is required'},
+                {"error": "Price is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -51,7 +52,7 @@ class PropertyOfferCreateAPIView(APIView):
         )
         
         return Response(
-            {'message': 'Offer created successfully'},
+            {"message": "Offer created successfully"},
             status=status.HTTP_201_CREATED
         )
         
@@ -76,14 +77,14 @@ class PropertyOfferUpdateAPIView(APIView):
     def patch(self, request, offer_id, offer_state):
         offer = get_object_or_404(PropertyOffers, pk=offer_id)
         
-        if offer.property.owner != request.user:
+        if offer.property.owner != request.user or offer.state != MobileState.PENDING:
             response = Response(
-                {'error': 'You are not authorized to change the state of this offer'},
+                {"error": "You are not authorized to change the state of this offer"},
                 status=status.HTTP_403_FORBIDDEN
             )
         else:
             message = offer.mark_accepted() if offer_state else offer.mark_rejected()
-            offer.save()
+            offer.save(update_fields=["state"])
             response = Response({"message": message})
         
         return response
@@ -99,7 +100,7 @@ class PropertyOfferWithdrawAPIView(APIView):
             )
         else:
             offer.is_active = False
-            offer.save(update_fields=['is_active'])
+            offer.save(update_fields=["is_active"])
             response = Response(
                 {"message": "Your offer is withdrawn"},
                 )
