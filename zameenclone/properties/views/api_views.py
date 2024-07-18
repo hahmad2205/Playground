@@ -30,7 +30,9 @@ class PropertyListAPIView(APIView):
     def get(self, request):
         query = request.GET.get("search")
         queryset = (
-            Property.objects.filter(is_active=True, is_sold=False, owner=request.user).
+            Property.objects.filter(
+                is_active=True, is_sold=False, owner=request.user
+            ).
             prefetch_related("images", "amenities", "offers", "owner")
         )
         
