@@ -75,9 +75,9 @@ class PropertyOfferFromPropertyListAPIView(APIView):
 
 class PropertyOfferUpdateAPIView(APIView):
     def patch(self, request, offer_id, offer_state):
-        offer = get_object_or_404(PropertyOffers, pk=offer_id)
+        offer = get_object_or_404(PropertyOffers, pk=offer_id, state = MobileState.PENDING)
         
-        if offer.property.owner != request.user or offer.state != MobileState.PENDING:
+        if offer.property.owner != request.user:
             response = Response(
                 {"error": "You are not authorized to change the state of this offer"},
                 status=status.HTTP_403_FORBIDDEN
