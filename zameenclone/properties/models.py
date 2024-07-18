@@ -107,7 +107,6 @@ class RetreiveOffersManager(models.Manager):
 class PropertyOffers(SoftdeleteModelMixin):
     price = models.PositiveIntegerField()
     state = FSMField(default=MobileState.PENDING, protected=True, choices=MobileState.choices)
-
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
     

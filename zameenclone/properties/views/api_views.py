@@ -3,10 +3,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.permissions import IsAuthenticated
 from properties.models import Property, PropertyOffers
 from properties.serializers import PropertyOfferSerializer
 from properties.enums import MobileState
+from properties.permissions import IsOwner, OfferIsActive, OfferedByAuthenticatedUser
 from core.utils import get_serialized_data
 
 
@@ -31,32 +32,25 @@ class PropertyListAPIView(APIView):
 
 
 class PropertyOfferCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsOwner]
+    
     def post(self, request, property_id):
-        property = get_object_or_404(Property, pk=property_id)
-        
-        if property.owner == request.user:
-            return Response(
-                {"error": "You cannot make an offer on your own property"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        price = request.data.get("price")
-        if price is None:
-            return Response(
-                {"error": "Price is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        PropertyOffers.objects.create(
-            price=price, offered_by=request.user, property=property
-        )
-        
-        return Response(
-            {"message": "Offer created successfully"},
-            status=status.HTTP_201_CREATED
-        )
-        
-        
+        property = get_object_or_404(Property, pk=property_id, is_active=True, is_sold=False)
+        self.check_object_permissions(request, property)
+        data = request.data
+        data["offered_by"] = request.user.id
+        data["property"] = property_id
+        serializer = PropertyOfferSerializer(data=data)
+        print(data)
+        if serializer.is_valid():
+            serializer.save()
+            response = Response(serializer.data, status=status.HTTP_201_CREATED)
+        else: 
+            response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return response
+
+
 class PropertyOfferListAPIView(APIView):
     def get(self, request):
         offers = PropertyOffers.objects.active().filter(property__owner=request.user)
@@ -74,35 +68,41 @@ class PropertyOfferFromPropertyListAPIView(APIView):
 
 
 class PropertyOfferUpdateAPIView(APIView):
+    permission_classes = [
+        IsAuthenticated, OfferIsActive
+    ]
+    
     def patch(self, request, offer_id, offer_state):
-        offer = get_object_or_404(PropertyOffers, pk=offer_id, state = MobileState.PENDING)
+        offer = get_object_or_404(PropertyOffers, pk=offer_id, state=MobileState.PENDING)
+        self.check_object_permissions(request, offer)
         
-        if offer.property.owner != request.user:
-            response = Response(
-                {"error": "You are not authorized to change the state of this offer"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        if offer_state:
+            message = offer.mark_accepted()
         else:
-            message = offer.mark_accepted() if offer_state else offer.mark_rejected()
-            offer.save(update_fields=["state"])
-            response = Response({"message": message})
+            message = offer.mark_rejected()
         
-        return response
-
+        offer.save()
+        
+        serializer = PropertyOfferSerializer(offer)
+        return Response({"message": message, "offer": serializer.data})
+        
 
 class PropertyOfferWithdrawAPIView(APIView):
+    permission_classes = [
+        IsAuthenticated, OfferIsActive, OfferedByAuthenticatedUser
+    ]
+    
     def patch(self, request, offer_id):
         offer = get_object_or_404(PropertyOffers, pk=offer_id)
-        if not offer.is_active:
-            response = Response(
-                {"message": "Offer is already withdrawn"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        else:
-            offer.is_active = False
-            offer.save(update_fields=["is_active"])
-            response = Response(
-                {"message": "Your offer is withdrawn"},
-                )
+        self.check_object_permissions(request, offer)
+        data = {"is_active": False}
+        serializer = PropertyOfferSerializer(offer, data=data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            response = Response({"message": "Your offer is withdrawn"})
+        else: 
+            response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return response
+

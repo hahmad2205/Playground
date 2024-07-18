@@ -13,11 +13,9 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
-    offered_by = UserSerializer()
-    
     class Meta:
         model = PropertyOffers
-        fields = ["id", "price", "offered_by"]
+        fields = ["id", "price", "offered_by", "property", "is_active"]
 
 
 class PropertyAmenitySerializer(serializers.ModelSerializer):
