@@ -77,20 +77,31 @@ class PropertyOfferUpdateAPIView(APIView):
         offer = get_object_or_404(PropertyOffers, pk=offer_id)
         
         if offer.property.owner != request.user:
-            return Response(
+            response = Response(
                 {'error': 'You are not authorized to change the state of this offer'},
                 status=status.HTTP_403_FORBIDDEN
             )
-        message = offer.mark_accepted() if offer_state else offer.mark_rejected()
-        offer.save()
+        else:
+            message = offer.mark_accepted() if offer_state else offer.mark_rejected()
+            offer.save()
+            response = Response({"message": message})
         
-        return Response({"message": message})
+        return response
 
 
 class PropertyOfferWithdrawAPIView(APIView):
     def patch(self, request, offer_id):
         offer = get_object_or_404(PropertyOffers, pk=offer_id)
-        offer.is_active=False
-        offer.save()
-        return Response({"message": "Your offer is withdrawn"})
+        if not offer.is_active:
+            response = Response(
+                {"message": "Offer is already withdrawn"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        else:
+            offer.is_active = False
+            offer.save(update_fields=['is_active'])
+            response = Response(
+                {"message": "Your offer is withdrawn"},
+                )
 
+        return response
