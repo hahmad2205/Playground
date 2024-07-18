@@ -103,6 +103,7 @@ class RetreiveOffersManager(models.Manager):
     def active(self):
         return self.filter(is_active=True, state=MobileState.PENDING.value)
 
+
 class PropertyOffers(SoftdeleteModelMixin):
     price = models.PositiveIntegerField()
     state = FSMField(default=MobileState.PENDING, protected=True, choices=MobileState.choices)
@@ -135,6 +136,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     def mark_rejected(self):
         return "Offer switched to rejected!"
 
+
 class PropertyAmenity(SoftdeleteModelMixin):
     value = models.PositiveIntegerField(null=True, blank=True)
     
@@ -143,3 +145,4 @@ class PropertyAmenity(SoftdeleteModelMixin):
 
     def __str__(self):
         return f"{self.property} | ID: {self.id}"
+
