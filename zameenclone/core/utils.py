@@ -10,7 +10,7 @@ def create_pagination(properties, request):
     page_number = request.GET.get("page")
     return paginator.get_page(page_number)
 
-def get_filtered_data(request, queryset):
+def get_serialized_data(request, queryset):
     query = request.query_params.get("search")
     if query:
             queryset = queryset.filter(

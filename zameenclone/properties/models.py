@@ -11,6 +11,12 @@ from .enums import MobileState
 
 User = get_user_model()
 
+
+class ActiveManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True, is_sold=False)
+
+
 class Property(SoftdeleteModelMixin):
     area = models.PositiveSmallIntegerField()
     description = models.TextField()
@@ -28,6 +34,8 @@ class Property(SoftdeleteModelMixin):
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name="amenities")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
 
+    objects = ActiveManager()
+    
     def get_first_image(self):
         return self.images.first()
         
