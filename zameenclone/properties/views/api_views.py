@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from properties.models import Property, PropertyOffers
 from properties.serializers import PropertyOfferSerializer
 from properties.enums import MobileState
-from properties.permissions import IsNotPropertyOwner, IsOfferOwner
+from properties.permissions import IsNotPropertyOwner, IsOfferOwner, IsNotOfferOwner
 from core.utils import get_serialized_data
 
 
@@ -63,18 +63,22 @@ class PropertyOfferFromPropertyListAPIView(APIView):
 
 
 class PropertyOfferUpdateStateAPIView(APIView):
-    def patch(self, request, id, state):
+    permission_classes = [IsAuthenticated, IsNotOfferOwner]
+    
+    def patch(self, request, id):
+        state = request.data.get("state")
         offer = get_object_or_404(
             PropertyOffers, pk=id, state=MobileState.PENDING,
             is_active=True, property__is_active=True, property__is_sold=False
         )
+        self.check_object_permissions(request, offer)
         
-        if state:
+        if state == "accept":
             message = offer.mark_accepted()
-        else:
+        elif state == "reject":
             message = offer.mark_rejected()
         
-        offer.save()
+        offer.save(update_fields=["state"])
         
         return Response({"message": message})
         

@@ -23,3 +23,4 @@ def get_serialized_data(request, queryset):
     
     serializer = PropertySerializer(queryset, many=True)
     return serializer.data
+
