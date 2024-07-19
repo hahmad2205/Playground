@@ -3,15 +3,16 @@ from rest_framework.exceptions import ValidationError
 
 
 from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
-from core.serializers import AmenityOptionSerializer
 from properties.enums import MobileState
+from core.serializers import AmenityOptionSerializer
+from core.models import AmenityOption
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = PropertyImages
-        fields = ["id", "image_url"]
+        fields = ["image_url"]
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
@@ -35,10 +36,9 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
     
 
 class PropertySerializer(serializers.ModelSerializer):
-    images = PropertyImageSerializer(many=True)
-    offers = PropertyOfferSerializer(many=True)
-    amenities = PropertyAmenitySerializer(many=True)
-    owner = serializers.CharField(source="owner.get_full_name")
+    images = PropertyImageSerializer(many=True, partial=True, required=False)
+    offers = PropertyOfferSerializer(many=True, partial=True, required=False)
+    amenities = PropertyAmenitySerializer(many=True, partial=True, required=False)
     
     class Meta:
         model = Property
@@ -48,4 +48,20 @@ class PropertySerializer(serializers.ModelSerializer):
             "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
             "is_sold"
         ]
+        
+    def create(self, validated_data):
+        images_data = validated_data.pop('images', [])
+        amenities_data = validated_data.pop('amenities', [])
+        
+        property_instance = Property.objects.create(**validated_data)
+        
+        for image_data in images_data:
+            PropertyImages.objects.create(property=property_instance, **image_data)
+        
+        for amenity_data in amenities_data:
+            amenity_option_data = amenity_data.pop('amenity')
+            amenity_option, created = AmenityOption.objects.get_or_create(**amenity_option_data)
+            PropertyAmenity.objects.create(property=property_instance, amenity=amenity_option, **amenity_data)
+        
+        return property_instance
 

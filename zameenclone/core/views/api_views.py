@@ -16,4 +16,3 @@ class AmenityOptionListAPIView(APIView):
         serializer = AmenityOptionSerializer(AmenityOption.objects.filter(amenity=id), many=True)
         return Response({"amenity_options": serializer.data})
 
-

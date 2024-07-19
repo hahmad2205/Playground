@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from properties.models import Property, PropertyOffers
-from properties.serializers import PropertyOfferSerializer
+from properties.serializers import PropertyOfferSerializer, PropertySerializer
 from properties.enums import MobileState
 from properties.permissions import IsNotPropertyOwner, IsOfferOwner, IsNotOfferOwner
 from core.utils import get_serialized_data
@@ -103,4 +103,17 @@ class PropertyOfferWithdrawAPIView(APIView):
             response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return response
+
+
+class PropertyCreateAPIView(APIView):
+    def post(self, request):
+        data = request.data
+        data["owner"] = request.user.id
+        data["is_sold"] = False
+        data["is_active"] = True
+        serialzer = PropertySerializer(data=data)
+        if serialzer.is_valid():
+            serialzer.save()
+
+        return Response(serialzer.errors)
 
