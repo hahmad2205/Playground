@@ -1,8 +1,10 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from .models import Property, PropertyImages, PropertyOffers, PropertyAmenity
+
+from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from core.serializers import AmenityOptionSerializer
-from users.serializers import UserSerializer
+from properties.enums import MobileState
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -13,9 +15,15 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = PropertyOffers
-        fields = ["id", "price", "offered_by", "property", "is_active"]
+        fields = ["id", "price", "offered_by", "property", "is_active", "state"]
+
+    def validate_state(self, value):
+        if value not in [MobileState.ACCEPTED, MobileState.REJECTED]:
+            raise ValidationError("State can only be set to accepted or rejected.")
+        return value
 
 
 class PropertyAmenitySerializer(serializers.ModelSerializer):

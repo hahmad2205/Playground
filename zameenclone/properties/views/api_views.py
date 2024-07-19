@@ -67,22 +67,25 @@ class PropertyOfferUpdateStateAPIView(APIView):
     permission_classes = [IsAuthenticated, IsNotOfferOwner]
     
     def patch(self, request, id):
-        state = request.data.get("state")
         offer = get_object_or_404(
             PropertyOffers, pk=id, state=MobileState.PENDING,
             is_active=True, property__is_active=True, property__is_sold=False
         )
         self.check_object_permissions(request, offer)
-        
-        if state == "accept":
+
+        serializer = PropertyOfferSerializer(offer, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        state = request.data.get("state")
+        if state == MobileState.ACCEPTED:
             message = offer.mark_accepted()
-        elif state == "reject":
+        elif state == MobileState.REJECTED:
             message = offer.mark_rejected()
         
-        offer.save(update_fields=["state", "is_active", "property"])
+        offer.save(update_fields=["state", "is_active", "property", "modified"])
         
         return Response({"message": message})
-        
+
 
 class PropertyOfferWithdrawAPIView(APIView):
     permission_classes = [IsAuthenticated, IsOfferOwner]

@@ -1,7 +1,8 @@
 from django.db.models import Q
 
 from django.core.paginator import Paginator
-from properties.models import Property, PropertyFilter
+from properties.models import Property
+from properties.filters import PropertyFilter
 from properties.serializers import PropertySerializer
 
 def create_pagination(properties, request):
