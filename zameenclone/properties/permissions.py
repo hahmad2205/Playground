@@ -11,5 +11,5 @@ class IsOfferOwner(BasePermission):
 
 class IsNotOfferOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.offered_by !=request.user
+        return obj.offered_by != request.user
 
