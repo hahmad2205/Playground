@@ -12,7 +12,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = PropertyImages
-        fields = ["image_url"]
+        fields = ["id", "image_url"]
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
@@ -60,7 +60,7 @@ class PropertySerializer(serializers.ModelSerializer):
         
         for amenity_data in amenities_data:
             amenity_option_data = amenity_data.pop('amenity')
-            amenity_option, created = AmenityOption.objects.get_or_create(**amenity_option_data)
+            amenity_option = AmenityOption.objects.get(pk=amenity_option_data.get("option"))
             PropertyAmenity.objects.create(property=property_instance, amenity=amenity_option, **amenity_data)
         
         return property_instance
