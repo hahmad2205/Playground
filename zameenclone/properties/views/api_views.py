@@ -24,3 +24,4 @@ class PropertyListAPIView(APIView):
         
         return Response(data=get_serialized_data(request, queryset))
 
+

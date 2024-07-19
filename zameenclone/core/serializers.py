@@ -7,7 +7,7 @@ class AmenitySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Amenity
-        fields = ["name"]
+        fields = ["id", "name"]
 
 
 class AmenityOptionSerializer(serializers.ModelSerializer):    
@@ -15,5 +15,5 @@ class AmenityOptionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AmenityOption
-        fields = ["amenity", "option"]
+        fields = ["id", "amenity", "option"]
 
