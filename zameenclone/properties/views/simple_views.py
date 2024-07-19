@@ -4,9 +4,10 @@ from django.contrib import messages
 from django.db.models import Q
 from django.forms import modelformset_factory
 
-from ..forms import PropertyForm, PropertyImagesForm, PropertyAmenityForm, OfferForm
-from ..models import Property, PropertyImages, PropertyAmenity, PropertyFilter, PropertyOffers
-from ..enums import MobileState
+from properties.forms import PropertyForm, PropertyImagesForm, PropertyAmenityForm, OfferForm
+from properties.models import Property, PropertyImages, PropertyAmenity, PropertyOffers
+from properties.filters import PropertyFilter
+from properties.enums import MobileState
 from core.utils import create_pagination
 
 @login_required
