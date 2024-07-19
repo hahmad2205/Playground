@@ -1,15 +1,10 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsOwner(BasePermission):
+class IsNotPropertyOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner != request.user
-
-
-class OfferIsActive(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.is_active == True
     
-class OfferedByAuthenticatedUser(BasePermission):
+class IsOfferOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.offered_by == request.user

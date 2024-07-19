@@ -18,9 +18,9 @@ urlpatterns = [
     # api views
     path("api/marketplace/", PropertyMarketplaceListAPIView.as_view(), name="marketplace_api"),
     path("api/", PropertyListAPIView.as_view(), name="properties_api"),
-    path("api/offers/<int:property_id>/", PropertyOfferCreateAPIView.as_view(), name="create_offer_api"),
+    path("api/offers/<int:id>/", PropertyOfferCreateAPIView.as_view(), name="create_offer_api"),
     path("api/offers/", PropertyOfferListAPIView.as_view(), name="get_offers_api"),
-    path("api/<int:property_id>/offers/", PropertyOfferFromPropertyListAPIView.as_view(), name="get_property_offers_api"),
-    path("api/offers/<int:offer_id>/<int:offer_state>/", PropertyOfferUpdateAPIView.as_view(), name="update_state"),
-    path("api/offers/withdraw/<int:offer_id>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
+    path("api/<int:id>/offers/", PropertyOfferFromPropertyListAPIView.as_view(), name="get_property_offers_api"),
+    path("api/offers/<int:id>/<int:state>/", PropertyOfferUpdateStateAPIView.as_view(), name="update_state"),
+    path("api/offers/withdraw/<int:id>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
 ]

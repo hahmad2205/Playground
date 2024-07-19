@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from properties.models import Property, PropertyOffers
 from properties.serializers import PropertyOfferSerializer
 from properties.enums import MobileState
-from properties.permissions import IsOwner, OfferIsActive, OfferedByAuthenticatedUser
+from properties.permissions import IsNotPropertyOwner, IsOfferOwner
 from core.utils import get_serialized_data
 
 
@@ -32,24 +32,19 @@ class PropertyListAPIView(APIView):
 
 
 class PropertyOfferCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [IsAuthenticated, IsNotPropertyOwner]
     
-    def post(self, request, property_id):
-        property = get_object_or_404(Property, pk=property_id, is_active=True, is_sold=False)
+    def post(self, request, id):
+        property = get_object_or_404(Property, pk=id, is_active=True, is_sold=False)
         self.check_object_permissions(request, property)
         data = request.data
         data["offered_by"] = request.user.id
-        data["property"] = property_id
+        data["property"] = id
         serializer = PropertyOfferSerializer(data=data)
-        print(data)
         if serializer.is_valid():
             serializer.save()
-            response = Response(serializer.data, status=status.HTTP_201_CREATED)
-        else: 
-            response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        return response
-
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
 
 class PropertyOfferListAPIView(APIView):
     def get(self, request):
@@ -60,40 +55,35 @@ class PropertyOfferListAPIView(APIView):
 
 
 class PropertyOfferFromPropertyListAPIView(APIView):
-    def get(self, request, property_id):
-        offers = PropertyOffers.objects.active().filter(property=property_id)
+    def get(self, request, id):
+        offers = PropertyOffers.objects.active().filter(property=id)
         serializer = PropertyOfferSerializer(offers, many=True)
         
         return Response(data=serializer.data)
 
 
-class PropertyOfferUpdateAPIView(APIView):
-    permission_classes = [
-        IsAuthenticated, OfferIsActive
-    ]
-    
-    def patch(self, request, offer_id, offer_state):
-        offer = get_object_or_404(PropertyOffers, pk=offer_id, state=MobileState.PENDING)
-        self.check_object_permissions(request, offer)
+class PropertyOfferUpdateStateAPIView(APIView):
+    def patch(self, request, id, state):
+        offer = get_object_or_404(
+            PropertyOffers, pk=id, state=MobileState.PENDING,
+            is_active=True, property__is_active=True, property__is_sold=False
+        )
         
-        if offer_state:
+        if state:
             message = offer.mark_accepted()
         else:
             message = offer.mark_rejected()
         
         offer.save()
         
-        serializer = PropertyOfferSerializer(offer)
-        return Response({"message": message, "offer": serializer.data})
+        return Response({"message": message})
         
 
 class PropertyOfferWithdrawAPIView(APIView):
-    permission_classes = [
-        IsAuthenticated, OfferIsActive, OfferedByAuthenticatedUser
-    ]
+    permission_classes = [IsAuthenticated, IsOfferOwner]
     
-    def patch(self, request, offer_id):
-        offer = get_object_or_404(PropertyOffers, pk=offer_id)
+    def patch(self, request, id):
+        offer = get_object_or_404(PropertyOffers, pk=id, is_active=True, state=MobileState.PENDING)
         self.check_object_permissions(request, offer)
         data = {"is_active": False}
         serializer = PropertyOfferSerializer(offer, data=data, partial=True)
