@@ -78,7 +78,7 @@ class PropertyOfferUpdateStateAPIView(APIView):
         elif state == "reject":
             message = offer.mark_rejected()
         
-        offer.save(update_fields=["state"])
+        offer.save(update_fields=["state", "is_active", "property"])
         
         return Response({"message": message})
         

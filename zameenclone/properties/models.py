@@ -122,6 +122,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     @transition(field="state", source=MobileState.PENDING, target=MobileState.ACCEPTED)
     def mark_accepted(self):
         self.property.is_active = False
+        self.property.save(update_fields=["is_active"])
         self.is_active = False
         other_offers = self.__class__.objects.filter(
             property=self.property,
@@ -129,13 +130,12 @@ class PropertyOffers(SoftdeleteModelMixin):
         ).exclude(id=self.id)
 
         with transaction.atomic():
-            other_offers.update(state=MobileState.REJECTED)
+            other_offers.update(state=MobileState.REJECTED, is_active=False)
 
         return "Offer switched to accepted!"
     
     @transition(field="state", source=MobileState.PENDING, target=MobileState.REJECTED)
     def mark_rejected(self):
-        self.property.is_active = False
         self.is_active = False
         return "Offer switched to rejected!"
 
