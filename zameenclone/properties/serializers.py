@@ -7,7 +7,6 @@ from rest_framework.exceptions import ValidationError
 from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from properties.enums import MobileState
 from core.serializers import AmenityOptionSerializer
-from users.models import User
 from core.models import AmenityOption
 
 
@@ -46,8 +45,10 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    images = PropertyImageSerializer(many=True, partial=True, required=False)
-    amenities = PropertyAmenitySerializer(many=True, partial=True, required=False)
+    images = serializers.ListField(child=PropertyImageSerializer(), write_only=True)
+    amenities = serializers.ListField(child=PropertyAmenitySerializer(), write_only=True)
+    # images = PropertyImageSerializer(many=True, partial=True, required=False)
+    # amenities = PropertyAmenitySerializer(many=True, partial=True, required=False)
 
     class Meta:
         model = Property
