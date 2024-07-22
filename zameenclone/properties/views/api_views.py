@@ -109,11 +109,9 @@ class PropertyCreateAPIView(APIView):
     def post(self, request):
         data = request.data
         data["owner"] = request.user.id
-        data["is_sold"] = False
-        data["is_active"] = True
-        serialzer = PropertySerializer(data=data)
-        if serialzer.is_valid():
-            serialzer.save()
+        serializer = PropertySerializer(data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
 
-        return Response(serialzer.errors)
+        return Response(serializer.data)
 

@@ -8,6 +8,6 @@ urlpatterns = [
     path('get-amenity-options/', simple_views.get_amenity_options, name='get_amenity_options'),
     
     # api views
-    path("amenity/", AmenityListAPIView.as_view(), name="amenity_type"),
-    path("amenity-options/<int:id>", AmenityOptionListAPIView.as_view(), name="amenity_options"),
+    path("amenity/", AmenityListAPIView.as_view(), name="amenities"),
+    path("amenity/<int:id>/options/", AmenityOptionListAPIView.as_view(), name="amenity_options"),
 ]
