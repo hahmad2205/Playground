@@ -1,8 +1,8 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-
 
 from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from properties.enums import MobileState
@@ -38,17 +38,15 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         amenity_data = validated_data.pop('amenity')
-        amenity_instance = get_object_or_404(AmenityOption, pk=amenity_data.get("option"))
-        validated_data["amenity"] = amenity_instance
+        amenity = get_object_or_404(AmenityOption, pk=amenity_data.get("option"))
+        validated_data["amenity"] = amenity
         property_amenity = super().create(validated_data)
         return property_amenity
 
 
 class PropertySerializer(serializers.ModelSerializer):
-    images = serializers.ListField(child=PropertyImageSerializer(), write_only=True)
+    images = serializers.ListField(child=serializers.URLField(), write_only=True)
     amenities = serializers.ListField(child=PropertyAmenitySerializer(), write_only=True)
-    # images = PropertyImageSerializer(many=True, partial=True, required=False)
-    # amenities = PropertyAmenitySerializer(many=True, partial=True, required=False)
 
     class Meta:
         model = Property
@@ -59,37 +57,41 @@ class PropertySerializer(serializers.ModelSerializer):
             "is_sold"
         ]
 
-    def save_images(self, images, property_instance):
-        for image in images:
-            image["property"] = property_instance.id
-            image_serializer = PropertyImageSerializer(data=image)
-            if image_serializer.is_valid():
-                image_serializer.save()
-            else:
-                raise serializers.ValidationError(image_serializer.errors)
+    def save_images(self, images, property):
+        image_instances = [
+            {"property": property.id, "image_url": image}
+            for image in images
+        ]
 
-    def save_amenities(self, amenities, property_instance):
+        image_serializer = PropertyImageSerializer(data=image_instances, many=True)
+        if image_serializer.is_valid(raise_exception=True):
+            image_serializer.save()
+
+    def save_amenities(self, amenities, property):
+        amenity_instances = []
         for amenity_data in amenities:
             amenity_option = amenity_data.pop("amenity")
-            data = {
-                "property": property_instance.id,
-                "amenity": amenity_option,
-                **amenity_data
-            }
-            amenity_serializer = PropertyAmenitySerializer(data=data)
-            if amenity_serializer.is_valid():
-                amenity_serializer.save()
-            else:
-                raise serializers.ValidationError(amenity_serializer.errors)
+            amenity_instances.append(
+                {
+                    "property": property.id,
+                    "amenity": amenity_option,
+                    **amenity_data
+                }
+            )
+
+        amenity_serializer = PropertyAmenitySerializer(data=amenity_instances, many=True)
+        if amenity_serializer.is_valid(raise_exception=True):
+            amenity_serializer.save()
 
     def create(self, validated_data):
         images = validated_data.pop("images", [])
         amenities = validated_data.pop("amenities", [])
 
-        property_instance = super().create(validated_data)
+        with transaction.atomic():
+            property = super().create(validated_data)
 
-        self.save_images(images, property_instance)
-        self.save_amenities(amenities, property_instance)
+            self.save_images(images, property)
+            self.save_amenities(amenities, property)
 
-        return property_instance
+        return property
 

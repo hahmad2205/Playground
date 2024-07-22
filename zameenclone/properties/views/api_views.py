@@ -96,11 +96,9 @@ class PropertyOfferWithdrawAPIView(APIView):
         data = {"is_active": False}
         serializer = PropertyOfferSerializer(offer, data=data, partial=True)
         
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             response = Response({"message": "Your offer is withdrawn"})
-        else: 
-            response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return response
 
@@ -110,11 +108,9 @@ class PropertyCreateAPIView(APIView):
         data = request.data
         data["owner"] = request.user.id
         serializer = PropertySerializer(data=data, partial=True)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             response = Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return response
 
