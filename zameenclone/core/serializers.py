@@ -11,7 +11,7 @@ class AmenitySerializer(serializers.ModelSerializer):
 
 
 class AmenityOptionSerializer(serializers.ModelSerializer):    
-    amenity = AmenitySerializer()
+    amenity = serializers.SlugRelatedField(queryset=Amenity.objects.all(), slug_field="name")
     
     class Meta:
         model = AmenityOption

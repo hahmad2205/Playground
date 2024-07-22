@@ -23,4 +23,6 @@ urlpatterns = [
     path("api/<int:id>/offers/", PropertyOfferFromPropertyListAPIView.as_view(), name="get_property_offers_api"),
     path("api/update-offers/<int:id>/", PropertyOfferUpdateStateAPIView.as_view(), name="update_state"),
     path("api/offers/withdraw/<int:id>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
+    path("api/<int:id>/", PropertyRetrieveAPIView.as_view(), name="property"),
+    path("api/<int:id>/update/", PropertyUpdateAPIView.as_view(), name="update_property")
 ]
