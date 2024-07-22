@@ -120,7 +120,6 @@ class PropertyUpdateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             super().create(validated_data)
             self.save_images(new_images, instance)
-            print("?////////////////////////////////////////////////////")
             self.save_amenities(new_amenities, instance)
             for image in deleted_images:
                 image_serializer = PropertyImagesAmenitiesUpdateSerializer(
