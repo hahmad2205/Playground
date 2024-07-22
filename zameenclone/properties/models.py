@@ -6,7 +6,7 @@ from django.conf import settings
 from django_fsm import FSMField, transition
 
 from core.models import AmenityOption, SoftdeleteModelMixin
-from .enums import MobileState
+from properties.enums import MobileState
 
 User = get_user_model()
 
