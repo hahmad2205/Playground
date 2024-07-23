@@ -73,9 +73,13 @@ class PropertyImagesAmenitiesUpdateSerializer(serializers.Serializer):
 
 class PropertyUpdateSerializer(serializers.ModelSerializer):
     new_images = serializers.ListField(child=serializers.URLField(), required=False)
-    deleted_images = serializers.ListField(child=serializers.IntegerField(), required=False)
+    deleted_images = serializers.PrimaryKeyRelatedField(
+        queryset=PropertyImages.objects.all(), many=True, required=False
+    )
     new_amenities = serializers.ListField(child=PropertyAmenitySerializer(), required=False)
-    deleted_amenities = serializers.ListField(child=serializers.IntegerField(), required=False)
+    deleted_amenities = serializers.PrimaryKeyRelatedField(
+        queryset=PropertyAmenity.objects.all(), many=True, required=False
+    )
 
     class Meta:
         model = Property
@@ -118,12 +122,13 @@ class PropertyUpdateSerializer(serializers.ModelSerializer):
         deleted_amenities = validated_data.pop("deleted_amenities", [])
 
         with transaction.atomic():
-            super().create(validated_data)
+            super().update(instance, validated_data)
             self.save_images(new_images, instance)
             self.save_amenities(new_amenities, instance)
+
             for image in deleted_images:
                 image_serializer = PropertyImagesAmenitiesUpdateSerializer(
-                    instance=get_object_or_404(PropertyImages, pk=image, property=instance),
+                    instance=image,
                     data={"is_active": False}
                 )
                 if image_serializer.is_valid(raise_exception=True):
@@ -131,7 +136,7 @@ class PropertyUpdateSerializer(serializers.ModelSerializer):
 
             for amenity in deleted_amenities:
                 amenity_serializer = PropertyImagesAmenitiesUpdateSerializer(
-                    instance=get_object_or_404(PropertyAmenity, pk=amenity, property=instance),
+                    instance=amenity,
                     data={"is_active": False}
                 )
                 if amenity_serializer.is_valid(raise_exception=True):
