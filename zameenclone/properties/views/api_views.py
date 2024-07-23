@@ -104,10 +104,11 @@ class PropertyOfferWithdrawAPIView(APIView):
 
         return response
 
+
 class PropertyRetrieveAPIView(APIView):
 
     def get(self, request, id):
-        property = get_object_or_404(Property, pk=id)
+        property = get_object_or_404(Property, pk=id, is_active=True, is_sold=False)
         serializer = PropertySerializer(property)
         return Response(serializer.data)
 
