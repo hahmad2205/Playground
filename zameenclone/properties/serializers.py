@@ -74,11 +74,11 @@ class PropertyImagesAmenitiesUpdateSerializer(serializers.Serializer):
 class PropertyUpdateSerializer(serializers.ModelSerializer):
     new_images = serializers.ListField(child=serializers.URLField(), required=False)
     deleted_images = serializers.PrimaryKeyRelatedField(
-        queryset=PropertyImages.objects.all(), many=True, required=False
+        queryset=PropertyImages.objects.filter(is_active=True), many=True, required=False
     )
     new_amenities = serializers.ListField(child=PropertyAmenitySerializer(), required=False)
     deleted_amenities = serializers.PrimaryKeyRelatedField(
-        queryset=PropertyAmenity.objects.all(), many=True, required=False
+        queryset=PropertyAmenity.objects.filter(is_active=True), many=True, required=False
     )
 
     class Meta:
