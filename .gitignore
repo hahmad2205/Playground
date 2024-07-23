@@ -10,3 +10,5 @@ __pycache__/
 *.pyc
 *.min.js
 media
+zameenclone/.idea
+.idea
