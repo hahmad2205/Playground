@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from properties.enums import MobileState
+from properties.utils import save_images, save_amenities
 from core.serializers import AmenityOptionSerializer
 from core.models import AmenityOption
 
@@ -57,32 +58,6 @@ class PropertySerializer(serializers.ModelSerializer):
             "is_sold"
         ]
 
-    def save_images(self, images, property):
-        image_instances = [
-            {"property": property.id, "image_url": image}
-            for image in images
-        ]
-
-        image_serializer = PropertyImageSerializer(data=image_instances, many=True)
-        if image_serializer.is_valid(raise_exception=True):
-            image_serializer.save()
-
-    def save_amenities(self, amenities, property):
-        amenity_instances = []
-        for amenity_data in amenities:
-            amenity_option = amenity_data.pop("amenity")
-            amenity_instances.append(
-                {
-                    "property": property.id,
-                    "amenity": amenity_option,
-                    **amenity_data
-                }
-            )
-
-        amenity_serializer = PropertyAmenitySerializer(data=amenity_instances, many=True)
-        if amenity_serializer.is_valid(raise_exception=True):
-            amenity_serializer.save()
-
     def create(self, validated_data):
         images = validated_data.pop("images", [])
         amenities = validated_data.pop("amenities", [])
@@ -90,8 +65,8 @@ class PropertySerializer(serializers.ModelSerializer):
         with transaction.atomic():
             property = super().create(validated_data)
 
-            self.save_images(images, property)
-            self.save_amenities(amenities, property)
+            save_images(images, property)
+            save_amenities(amenities, property)
 
         return property
 
