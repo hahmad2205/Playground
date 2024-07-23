@@ -1,9 +1,11 @@
-django 5.0.6
-django_extensions 
-django_filter 24.2
+django_extensions
+django_filter
 django-fsm
-faker
+faker~=26.0.0
 pillow
 
-djangorestframework 
+djangorestframework~=3.15.2
 djangorestframework-simplejwt
+
+Django~=5.0.6
+django-filter~=24.2
