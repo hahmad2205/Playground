@@ -1,39 +1,41 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
-from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from properties.models import Property, PropertyOffers
-from properties.serializers import PropertyDetailSerializer, PropertyOfferSerializer, PropertyOfferUpdateSerializer
+from properties.serializers import (
+    PropertyListDetailSerializer,
+    PropertyOfferSerializer,
+    PropertyOfferUpdateSerializer,
+    PropertyOfferWithdrawSerializer,
+    PropertyUpdateSerializer
+)
 from properties.filters import PropertyFilter
-from properties.permissions import IsNotPropertyOwner, IsPropertyOwner, IsNotOfferOwnerAndPropertyOwner
-from properties.enums import MobileState
+from properties.permissions import (
+    IsNotPropertyOwner,
+    IsPropertyOwner,
+    IsNotOfferOwnerAndPropertyOwner,
+    IsOfferOwner
+)
 
 
 class PropertyListMixin(generics.ListAPIView):
-    serializer_class = PropertyDetailSerializer
+    serializer_class = PropertyListDetailSerializer
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filterset_class = PropertyFilter
     search_fields = ["title", "location"]
 
 
 class PropertyMarketplaceListAPIView(PropertyListMixin):
-    queryset = (
-        Property.objects.active()
-        .prefetch_related("images", "amenities", "offers", "owner")
-    )
+    queryset = (Property.objects.active())
 
 
 class PropertyListAPIView(PropertyListMixin):
     def get_queryset(self):
-        return (
-            Property.objects.active().filter(owner=self.request.user)
-            .prefetch_related("images", "amenities", "offers").
-            select_related("owner")
-        )
+        return Property.objects.active().filter(owner=self.request.user)
 
 
 class PropertyOfferCreateAPIView(generics.CreateAPIView):
@@ -50,10 +52,9 @@ class PropertyOfferListAPIView(generics.ListAPIView):
 
 class PropertyOfferFromPropertyListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsPropertyOwner]
+    queryset = PropertyOffers.objects.active()
     serializer_class = PropertyOfferSerializer
-
-    def get_queryset(self):
-        return get_object_or_404(PropertyOffers, property=self.kwargs["id"], is_active=True)
+    lookup_url_kwarg = "property"
 
 
 class PropertyOfferUpdateStateAPIView(generics.UpdateAPIView):
@@ -68,3 +69,22 @@ class PropertyOfferUpdateStateAPIView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class PropertyDetailAPIView(generics.RetrieveAPIView):
+    queryset = Property.objects.active()
+    serializer_class = PropertyListDetailSerializer
+
+
+class PropertyOfferWithdrawAPIView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsOfferOwner]
+    queryset = PropertyOffers.objects.active()
+    serializer_class = PropertyOfferWithdrawSerializer
+    pass
+
+
+class PropertyUpdateAPIView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsPropertyOwner]
+    queryset = Property.objects.active()
+    serializer_class = PropertyUpdateSerializer
+

@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission
 
 from properties.models import Property
@@ -29,7 +30,7 @@ class IsNotOfferOwnerAndPropertyOwner(BasePermission):
 
 class IsPropertyOwner(BasePermission):
     def has_permission(self, request, view):
-        property = Property.objects.get(id=view.kwargs.get("id"))
+        property = get_object_or_404(Property, pk=view.kwargs.get("pk"), is_active=True, is_sold=False)
 
         return property.owner == request.user
 

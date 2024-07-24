@@ -44,6 +44,17 @@ class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PropertyOfferWithdrawSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyOffers
+        fields = ["id", "is_active"]
+
+    def update(self, instance, validated_data):
+        instance.is_active = False
+        instance.save(update_fields=["is_active", "modified"])
+        return instance
+
+
 class PropertyOfferSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -82,7 +93,7 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
         return property_amenity
 
 
-class PropertyDetailSerializer(serializers.ModelSerializer):
+class PropertyListDetailSerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True)
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
