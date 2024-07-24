@@ -22,6 +22,22 @@ class PropertyOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyOffers
         fields = ["id", "price", "offered_by", "property", "is_active", "state"]
+        read_only_fields = ["offered_by", "property"]
+
+    def validate(self, attrs):
+        property_id = self.context.get("property_id")
+        if not property_id:
+            raise serializers.ValidationError("Property ID is required.")
+
+        try:
+            property = Property.objects.active().get(id=property_id)
+        except Property.DoesNotExist:
+            raise serializers.ValidationError("Property does not exist or is not available.")
+
+        attrs["property"] = property
+        attrs["offered_by"] = self.context.get("request").user
+
+        return attrs
 
 
 class PropertyAmenitySerializer(serializers.ModelSerializer):
@@ -32,7 +48,7 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
         fields = ["id", "amenity", "value", "property"]
 
     def create(self, validated_data):
-        amenity_data = validated_data.pop('amenity')
+        amenity_data = validated_data.pop("amenity")
         amenity = get_object_or_404(AmenityOption, pk=amenity_data.get("option"))
         validated_data["amenity"] = amenity
         property_amenity = super().create(validated_data)
@@ -85,7 +101,7 @@ class PropertyImagesAmenitiesUpdateSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
 
     def update(self, instance, validated_data):
-        instance.is_active = validated_data.get('is_active', instance.is_active)
+        instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
         return instance
 

@@ -1,7 +1,7 @@
 from django.urls import path
 
 from properties.views import simple_views
-from properties.views.api_views import *
+# from properties.views.api_views import *
 from properties.views.generic_api_views import *
 
 urlpatterns = [
@@ -17,18 +17,25 @@ urlpatterns = [
     path("offer/<int:offer_id>/withdraw/", simple_views.withdraw_offer, name="withdraw_offer"),
     
     # api views
-    path("api/marketplace/", PropertyMarketplaceListAPIView.as_view(), name="marketplace_api"),
-    path("api/", PropertyListAPIView.as_view(), name="properties_api"),
-    path("api/offers/<int:id>/", PropertyOfferCreateAPIView.as_view(), name="create_offer_api"),
-    path("api/offers/", PropertyOfferListAPIView.as_view(), name="get_offers_api"),
-    path("api/<int:id>/offers/", PropertyOfferFromPropertyListAPIView.as_view(), name="get_property_offers_api"),
-    path("api/update-offers/<int:id>/", PropertyOfferUpdateStateAPIView.as_view(), name="update_state"),
-    path("api/offers/withdraw/<int:id>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
-    path("api/<int:id>/", PropertyRetrieveAPIView.as_view(), name="property"),
-    path("api/<int:id>/update/", PropertyUpdateAPIView.as_view(), name="update_property"),
-    path("api/add/", PropertyCreateAPIView.as_view(), name="add_property_api"),
+    # path("api/marketplace/", PropertyMarketplaceListAPIView.as_view(), name="marketplace_api"),
+    # path("api/", PropertyListAPIView.as_view(), name="properties_api"),
+    # path("api/offers/<int:id>/", PropertyOfferCreateAPIView.as_view(), name="create_offer_api"),
+    # path("api/offers/", PropertyOfferListAPIView.as_view(), name="get_offers_api"),
+    # path("api/<int:id>/offers/", PropertyOfferFromPropertyListAPIView.as_view(), name="get_property_offers_api"),
+    # path("api/update-offers/<int:id>/", PropertyOfferUpdateStateAPIView.as_view(), name="update_state"),
+    # path("api/offers/withdraw/<int:id>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
+    # path("api/<int:id>/", PropertyRetrieveAPIView.as_view(), name="property"),
+    # path("api/<int:id>/update/", PropertyUpdateAPIView.as_view(), name="update_property"),
+    # path("api/add/", PropertyCreateAPIView.as_view(), name="add_property_api"),
 
     # generic views
-    path("generic-api/marketplace/", PropertyMarketplaceListGenericView.as_view(), name="marketplace_generic_api"),
-    path("generic-api/", PropertyListGenericView.as_view(), name="properties_generic_api"),
+    path("generic-api/marketplace/", PropertyMarketplaceListAPIView.as_view(), name="marketplace_generic_api"),
+    path("generic-api/", PropertyListAPIView.as_view(), name="properties_generic_api"),
+    path("generic-api/<int:id>/create-offer", PropertyOfferCreateAPIView.as_view(), name="create_offer_generic_api"),
+    path("generic-api/offers", PropertyOfferListAPIView.as_view(), name="get_offers_generic_api"),
+    path(
+        "generic-api/<int:id>/offers",
+        PropertyOfferFromPropertyListAPIView.as_view(),
+        name="get_property_offers_generic_api"
+    )
 ]
