@@ -7,6 +7,7 @@ from properties.models import Property, PropertyImages, PropertyOffers, Property
 from properties.utils import save_images, save_amenities
 from core.serializers import AmenityOptionSerializer
 from core.models import AmenityOption
+from users.serializers import UserSerializer
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -36,6 +37,21 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
         validated_data["amenity"] = amenity
         property_amenity = super().create(validated_data)
         return property_amenity
+
+
+class PropertyRetrieveSerializer(serializers.ModelSerializer):
+    images = PropertyImageSerializer(many=True)
+    amenities = PropertyAmenitySerializer(many=True)
+    offers = PropertyOfferSerializer(many=True)
+    owner = UserSerializer()
+    class Meta:
+        model = Property
+        fields = [
+            "id", "images", "amenities", "owner", "is_active", "offers",
+            "area", "description", "header", "location", "purpose", "title",
+            "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
+            "is_sold"
+        ]
 
 
 class PropertySerializer(serializers.ModelSerializer):

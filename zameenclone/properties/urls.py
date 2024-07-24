@@ -2,6 +2,7 @@ from django.urls import path
 
 from properties.views import simple_views
 from properties.views.api_views import *
+from properties.views.generic_api_views import *
 
 urlpatterns = [
     # simple views
@@ -25,5 +26,9 @@ urlpatterns = [
     path("api/offers/withdraw/<int:id>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
     path("api/<int:id>/", PropertyRetrieveAPIView.as_view(), name="property"),
     path("api/<int:id>/update/", PropertyUpdateAPIView.as_view(), name="update_property"),
-    path("api/add/", PropertyCreateAPIView.as_view(), name="add_property_api")
+    path("api/add/", PropertyCreateAPIView.as_view(), name="add_property_api"),
+
+    # generic views
+    path("generic-api/marketplace/", PropertyMarketplaceListGenericView.as_view(), name="marketplace_generic_api"),
+    path("generic-api/", PropertyListGenericView.as_view(), name="properties_generic_api"),
 ]
