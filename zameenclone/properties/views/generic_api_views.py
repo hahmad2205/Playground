@@ -64,18 +64,7 @@ class PropertyOfferUpdateStateAPIView(generics.UpdateAPIView):
     def patch(self, request, *args, **kwargs):
         offer = self.get_object()
         self.check_object_permissions(request, offer)
-
-        serializer = self.get_serializer(offer, data=request.data, partial=True)
+        serializer = PropertyOfferUpdateSerializer(offer, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        state = request.data.get("state")
-
-        if state == MobileState.ACCEPTED:
-            message = offer.mark_accepted()
-        elif state == MobileState.REJECTED:
-            message = offer.mark_rejected()
-        else:
-            raise ValidationError("Invalid state value provided.")
-
-        offer.save(update_fields=["state", "is_active", "property", "modified"])
-
-        return Response({"message": message})
+        serializer.save()
+        return Response(serializer.data)

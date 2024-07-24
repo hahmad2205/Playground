@@ -2,9 +2,11 @@ from django.shortcuts import get_object_or_404
 
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from properties.utils import save_images, save_amenities
+from properties.enums import MobileState
 from core.serializers import AmenityOptionSerializer
 from core.models import AmenityOption
 from users.serializers import UserSerializer
@@ -21,7 +23,25 @@ class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyOffers
         fields = ["id", "state"]
-        read_only_fields = ["state"]
+
+    def validate(self, attrs):
+        state = attrs.get("state")
+        if state not in [MobileState.ACCEPTED, MobileState.REJECTED]:
+            raise ValidationError("Invalid state value provided.")
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        state = validated_data.get("state")
+        if state == MobileState.ACCEPTED:
+            message = instance.mark_accepted()
+        elif state == MobileState.REJECTED:
+            message = instance.mark_rejected()
+        else:
+            raise ValidationError("Invalid state value provided.")
+
+        instance.save(update_fields=['state', 'modified'])
+        return instance
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
