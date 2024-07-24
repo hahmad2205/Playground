@@ -31,11 +31,12 @@ urlpatterns = [
     # generic views
     path("generic-api/marketplace/", PropertyMarketplaceListAPIView.as_view(), name="marketplace_generic_api"),
     path("generic-api/", PropertyListAPIView.as_view(), name="properties_generic_api"),
-    path("generic-api/<int:id>/create-offer", PropertyOfferCreateAPIView.as_view(), name="create_offer_generic_api"),
-    path("generic-api/offers", PropertyOfferListAPIView.as_view(), name="get_offers_generic_api"),
+    path("generic-api/<int:id>/create-offer/", PropertyOfferCreateAPIView.as_view(), name="create_offer_generic_api"),
+    path("generic-api/offers/", PropertyOfferListAPIView.as_view(), name="get_offers_generic_api"),
     path(
-        "generic-api/<int:id>/offers",
+        "generic-api/<int:id>/offers/",
         PropertyOfferFromPropertyListAPIView.as_view(),
         name="get_property_offers_generic_api"
-    )
+    ),
+    path("generic-api/update-offers/<int:id>/", PropertyOfferUpdateStateAPIView.as_view(), name="update_state"),
 ]

@@ -100,6 +100,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     @transition(field="state", source=MobileState.PENDING, target=MobileState.ACCEPTED)
     def mark_accepted(self):
         self.property.is_active = False
+        self.property.is_sold = True
         self.property.save(update_fields=["is_active"])
         self.is_active = False
         other_offers = self.__class__.objects.filter(

@@ -17,6 +17,12 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image_url", "property"]
 
 
+class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyOffers
+        fields = ["id", "state"]
+        read_only_fields = ["state"]
+
 class PropertyOfferSerializer(serializers.ModelSerializer):
     
     class Meta:

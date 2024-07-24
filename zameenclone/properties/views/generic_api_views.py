@@ -1,13 +1,15 @@
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from properties.models import Property, PropertyOffers
-from properties.serializers import PropertyRetrieveSerializer, PropertyOfferSerializer
+from properties.serializers import PropertyRetrieveSerializer, PropertyOfferSerializer, PropertyOfferUpdateSerializer
 from properties.filters import PropertyFilter
-from properties.permissions import IsNotPropertyOwner, IsPropertyOwner
+from properties.permissions import IsNotPropertyOwner, IsPropertyOwner, IsNotOfferOwnerAndPropertyOwner
+from properties.enums import MobileState
 
 
 class PropertyListMixin(generics.ListAPIView):
@@ -57,3 +59,32 @@ class PropertyOfferFromPropertyListAPIView(generics.ListAPIView):
     def get_queryset(self):
         return PropertyOffers.objects.active().filter(property=self.kwargs["id"])
 
+
+class PropertyOfferUpdateStateAPIView(generics.UpdateAPIView):
+    queryset = PropertyOffers.objects.all()
+    serializer_class = PropertyOfferUpdateSerializer
+    permission_classes = [IsAuthenticated, IsNotOfferOwnerAndPropertyOwner]
+    lookup_field = "id"
+
+    def patch(self, request, *args, **kwargs):
+        offer = self.get_object()
+        self.check_object_permissions(request, offer)
+
+        serializer = self.get_serializer(offer, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        state = request.data.get("state")
+
+        try:
+            if state == MobileState.ACCEPTED:
+                message = offer.mark_accepted()
+            elif state == MobileState.REJECTED:
+                message = offer.mark_rejected()
+            else:
+                raise ValidationError("Invalid state value provided.")
+        except:
+            raise ValidationError("Can't switch the state.")
+
+        # Save the updated fields
+        offer.save(update_fields=["state", "is_active", "property", "modified"])
+
+        return Response({"message": message})
