@@ -23,6 +23,7 @@ class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
         fields = ["id", "state"]
         read_only_fields = ["state"]
 
+
 class PropertyOfferSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -31,7 +32,7 @@ class PropertyOfferSerializer(serializers.ModelSerializer):
         read_only_fields = ["offered_by", "property"]
 
     def validate(self, attrs):
-        property_id = self.context.get("property_id")
+        property_id = self.context["view"].kwargs.get("id")
         if not property_id:
             raise serializers.ValidationError("Property ID is required.")
 
@@ -61,11 +62,12 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
         return property_amenity
 
 
-class PropertyRetrieveSerializer(serializers.ModelSerializer):
+class PropertyDetailSerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True)
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
     owner = UserSerializer()
+
     class Meta:
         model = Property
         fields = [

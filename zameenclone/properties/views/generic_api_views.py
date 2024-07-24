@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
@@ -6,14 +7,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from properties.models import Property, PropertyOffers
-from properties.serializers import PropertyRetrieveSerializer, PropertyOfferSerializer, PropertyOfferUpdateSerializer
+from properties.serializers import PropertyDetailSerializer, PropertyOfferSerializer, PropertyOfferUpdateSerializer
 from properties.filters import PropertyFilter
 from properties.permissions import IsNotPropertyOwner, IsPropertyOwner, IsNotOfferOwnerAndPropertyOwner
 from properties.enums import MobileState
 
 
 class PropertyListMixin(generics.ListAPIView):
-    serializer_class = PropertyRetrieveSerializer
+    serializer_class = PropertyDetailSerializer
     filter_backends = (SearchFilter, DjangoFilterBackend)
     filterset_class = PropertyFilter
     search_fields = ["title", "location"]
@@ -36,13 +37,8 @@ class PropertyListAPIView(PropertyListMixin):
 
 
 class PropertyOfferCreateAPIView(generics.CreateAPIView):
-    serializer_class = PropertyOfferSerializer
     permission_classes = [IsAuthenticated, IsNotPropertyOwner]
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["property_id"] = self.kwargs.get("id")
-        return context
+    serializer_class = PropertyOfferSerializer
 
 
 class PropertyOfferListAPIView(generics.ListAPIView):
@@ -53,18 +49,17 @@ class PropertyOfferListAPIView(generics.ListAPIView):
 
 
 class PropertyOfferFromPropertyListAPIView(generics.ListAPIView):
-    serializer_class = PropertyOfferSerializer
     permission_classes = [IsAuthenticated, IsPropertyOwner]
+    serializer_class = PropertyOfferSerializer
 
     def get_queryset(self):
-        return PropertyOffers.objects.active().filter(property=self.kwargs["id"])
+        return get_object_or_404(PropertyOffers, property=self.kwargs["id"], is_active=True)
 
 
 class PropertyOfferUpdateStateAPIView(generics.UpdateAPIView):
-    queryset = PropertyOffers.objects.all()
-    serializer_class = PropertyOfferUpdateSerializer
     permission_classes = [IsAuthenticated, IsNotOfferOwnerAndPropertyOwner]
-    lookup_field = "id"
+    queryset = PropertyOffers.objects.active()
+    serializer_class = PropertyOfferUpdateSerializer
 
     def patch(self, request, *args, **kwargs):
         offer = self.get_object()
@@ -74,17 +69,13 @@ class PropertyOfferUpdateStateAPIView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         state = request.data.get("state")
 
-        try:
-            if state == MobileState.ACCEPTED:
-                message = offer.mark_accepted()
-            elif state == MobileState.REJECTED:
-                message = offer.mark_rejected()
-            else:
-                raise ValidationError("Invalid state value provided.")
-        except:
-            raise ValidationError("Can't switch the state.")
+        if state == MobileState.ACCEPTED:
+            message = offer.mark_accepted()
+        elif state == MobileState.REJECTED:
+            message = offer.mark_rejected()
+        else:
+            raise ValidationError("Invalid state value provided.")
 
-        # Save the updated fields
         offer.save(update_fields=["state", "is_active", "property", "modified"])
 
         return Response({"message": message})
