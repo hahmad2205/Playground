@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
     'django_fsm',
     'rest_framework',
     'rest_framework_simplejwt',
+    'silk'
 ]
 
 REST_FRAMEWORK = {
@@ -60,6 +61,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter'
     ],
 }
 
@@ -73,6 +78,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'zameenclone.urls'

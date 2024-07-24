@@ -27,7 +27,6 @@ def save_amenities(amenities, property):
                 **amenity_data
             }
         )
-
     amenity_serializer = PropertyAmenitySerializer(data=amenity_instances, many=True)
     if amenity_serializer.is_valid(raise_exception=True):
         amenity_serializer.save()

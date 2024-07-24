@@ -11,7 +11,8 @@ from properties.serializers import (
     PropertyOfferSerializer,
     PropertyOfferUpdateSerializer,
     PropertyOfferWithdrawSerializer,
-    PropertyUpdateSerializer
+    PropertyUpdateSerializer,
+    PropertySerializer
 )
 from properties.filters import PropertyFilter
 from properties.permissions import (
@@ -24,13 +25,12 @@ from properties.permissions import (
 
 class PropertyListMixin(generics.ListAPIView):
     serializer_class = PropertyListDetailSerializer
-    filter_backends = (SearchFilter, DjangoFilterBackend)
     filterset_class = PropertyFilter
     search_fields = ["title", "location"]
 
 
 class PropertyMarketplaceListAPIView(PropertyListMixin):
-    queryset = (Property.objects.active())
+    queryset = Property.objects.active()
 
 
 class PropertyListAPIView(PropertyListMixin):
@@ -62,7 +62,7 @@ class PropertyOfferUpdateStateAPIView(generics.UpdateAPIView):
     queryset = PropertyOffers.objects.active()
     serializer_class = PropertyOfferUpdateSerializer
 
-    def patch(self, request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         offer = self.get_object()
         self.check_object_permissions(request, offer)
         serializer = PropertyOfferUpdateSerializer(offer, data=request.data, partial=True)
@@ -80,11 +80,14 @@ class PropertyOfferWithdrawAPIView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsOfferOwner]
     queryset = PropertyOffers.objects.active()
     serializer_class = PropertyOfferWithdrawSerializer
-    pass
 
 
 class PropertyUpdateAPIView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated, IsPropertyOwner]
     queryset = Property.objects.active()
     serializer_class = PropertyUpdateSerializer
+
+
+class PropertyCreateAPIView(generics.CreateAPIView):
+    serializer_class = PropertySerializer
 

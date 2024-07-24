@@ -84,13 +84,13 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyAmenity
         fields = ["id", "amenity", "value", "property"]
+        read_only_fields = ["property", "amenity"]
 
     def create(self, validated_data):
         amenity_data = validated_data.pop("amenity")
         amenity = get_object_or_404(AmenityOption, pk=amenity_data.get("option"))
         validated_data["amenity"] = amenity
-        property_amenity = super().create(validated_data)
-        return property_amenity
+        return super().create(validated_data)
 
 
 class PropertyListDetailSerializer(serializers.ModelSerializer):
