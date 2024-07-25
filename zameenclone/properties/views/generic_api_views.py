@@ -30,12 +30,20 @@ class PropertyListMixin(generics.ListAPIView):
 
 
 class PropertyMarketplaceListAPIView(PropertyListMixin):
-    queryset = Property.objects.active()
+    queryset = (
+        Property.objects.active().
+        prefetch_related("images", "amenities", "offers").
+        select_related("owner")
+    )
 
 
 class PropertyListAPIView(PropertyListMixin):
     def get_queryset(self):
-        return Property.objects.active().filter(owner=self.request.user)
+        return (
+            Property.objects.active().filter(owner=self.request.user).
+            prefetch_related("images", "amenities", "offers").
+            select_related("owner")
+        )
 
 
 class PropertyOfferCreateAPIView(generics.CreateAPIView):
