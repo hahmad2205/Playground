@@ -4,7 +4,8 @@ from django.core.paginator import Paginator
 
 from properties.models import Property
 from properties.filters import PropertyFilter
-from properties.serializers import PropertySerializer, PropertyImageSerializer, PropertyAmenitySerializer
+from properties.serializers import PropertySerializer
+from core.pagination import CustomPagination
 
 
 def create_pagination(properties, request):
@@ -14,7 +15,7 @@ def create_pagination(properties, request):
     return paginator.get_page(page_number)
 
 
-def get_serialized_data(request, queryset):
+def get_serialized_data(self, request, queryset):
     query = request.query_params.get("search")
     if query:
         queryset = queryset.filter(
@@ -24,7 +25,8 @@ def get_serialized_data(request, queryset):
     filterset = PropertyFilter(request.GET, queryset=queryset)
     if filterset.is_valid:
         queryset = filterset.qs
-
-    serializer = PropertySerializer(queryset, many=True)
+    paginator = CustomPagination()
+    paginated_queryset = paginator.paginate_queryset(queryset, request, view=self)
+    serializer = PropertySerializer(paginated_queryset, many=True)
     return serializer.data
 

@@ -25,13 +25,11 @@ from properties.permissions import (
     IsOfferOwner
 )
 from properties.enums import MobileState
-from core.pagination import CustomPagination
 
 
 class PropertyListMixin(ListAPIView):
     serializer_class = PropertyListDetailSerializer
     filterset_class = PropertyFilter
-    pagination_class = CustomPagination
     search_fields = ["title", "location"]
     ordering_fields = ["pk", "price"]
     ordering = ["pk"]
@@ -69,7 +67,6 @@ class PropertyOfferCreateAPIView(CreateAPIView):
 
 class PropertyOfferListAPIView(ListAPIView):
     serializer_class = PropertyOfferListSerializer
-    pagination_class = CustomPagination
 
     def get_queryset(self):
         return PropertyOffers.objects.active().filter(property__owner=self.request.user, state=MobileState.PENDING.value)
@@ -77,9 +74,8 @@ class PropertyOfferListAPIView(ListAPIView):
 
 class PropertyOfferFromPropertyListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated, IsPropertyOwner]
-    queryset = PropertyOffers.objects.active().filter(state=MobileState.PENDING.value)
     serializer_class = PropertyOfferListSerializer
-    pagination_class = CustomPagination
+    queryset = PropertyOffers.objects.active().filter(state=MobileState.PENDING.value)
 
     def get_queryset(self):
         return (
@@ -89,25 +85,25 @@ class PropertyOfferFromPropertyListAPIView(ListAPIView):
 
 class PropertyOfferUpdateStateAPIView(UpdateAPIView):
     permission_classes = [IsAuthenticated, IsNotOfferOwnerAndPropertyOwner]
-    queryset = PropertyOffers.objects.active()
     serializer_class = PropertyOfferUpdateSerializer
+    queryset = PropertyOffers.objects.active()
 
 
 class PropertyDetailAPIView(RetrieveAPIView):
-    queryset = Property.objects.active()
     serializer_class = PropertyListDetailSerializer
+    queryset = Property.objects.active()
 
 
 class PropertyOfferWithdrawAPIView(UpdateAPIView):
     permission_classes = [IsAuthenticated, IsOfferOwner]
-    queryset = PropertyOffers.objects.active()
     serializer_class = PropertyOfferWithdrawSerializer
+    queryset = PropertyOffers.objects.active()
 
 
 class PropertyUpdateAPIView(UpdateAPIView):
     permission_classes = [IsAuthenticated, IsPropertyOwner]
-    queryset = Property.objects.active()
     serializer_class = PropertyUpdateSerializer
+    queryset = Property.objects.active()
 
 
 class PropertyCreateAPIView(CreateAPIView):

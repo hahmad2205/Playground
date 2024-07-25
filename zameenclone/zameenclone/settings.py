@@ -69,7 +69,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': (
         'core.pagination.CustomPagination'
-    )
+    ),
+    'PAGE_SIZE': 10
 }
 
 INSTALLED_APPS = DEAFAULT_APPS + CUSTOM_APPS + THIRD_PARTY_APPS

@@ -19,7 +19,7 @@ class PropertyMarketplaceListAPIView(APIView):
             .prefetch_related("images", "amenities", "offers", "owner")
         )
         
-        return Response(data=get_serialized_data(request, queryset))
+        return Response(data=get_serialized_data(self, request, queryset))
 
 
 class PropertyListAPIView(APIView):

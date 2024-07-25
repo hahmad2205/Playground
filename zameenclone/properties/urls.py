@@ -43,6 +43,6 @@ urlpatterns = [
     path("generic-api/offers/", PropertyOfferListAPIView.as_view(), name="get_offers_generic_api"),
     path("generic-api/update-offers/<int:pk>/", PropertyOfferUpdateStateAPIView.as_view(), name="update_state"),
     path("generic-api/offers/withdraw/<int:pk>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
-    path("generic-api/<int:pk>/update", PropertyUpdateAPIView.as_view(), name="update_property"),
+    path("generic-api/<int:pk>/update/", PropertyUpdateAPIView.as_view(), name="update_property"),
     path("generic-api/add/", PropertyCreateAPIView.as_view(), name="add_property")
 ]

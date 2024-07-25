@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework import serializers
 
@@ -6,7 +5,6 @@ from properties.models import Property, PropertyImages, PropertyOffers, Property
 from properties.utils import save_images, save_amenities
 from properties.enums import MobileState
 from core.serializers import AmenityOptionSerializer
-from core.models import AmenityOption
 from users.serializers import UserSerializer
 
 
@@ -18,10 +16,9 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
-    state = serializers.ChoiceField(choices=[
-        (MobileState.ACCEPTED, 'Accepted'),
-        (MobileState.REJECTED, 'Rejected')
-    ])
+    state = serializers.ChoiceField(
+        choices=[MobileState.ACCEPTED, MobileState.REJECTED]
+    )
 
     class Meta:
         model = PropertyOffers
@@ -29,11 +26,8 @@ class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         state = validated_data.get("state")
-        if state == MobileState.ACCEPTED:
-            instance.mark_accepted()
-        elif state == MobileState.REJECTED:
-            instance.mark_rejected()
-        instance.save()
+        instance.mark_accepted() if state == MobileState.ACCEPTED else instance.mark_rejected()
+        instance.save(update_fields=["state", "modified"])
         return instance
 
 
@@ -58,6 +52,7 @@ class PropertyOfferSerializer(serializers.ModelSerializer):
     property = serializers.PrimaryKeyRelatedField(
         queryset=Property.objects.active()
     )
+
 
     class Meta:
         model = PropertyOffers
