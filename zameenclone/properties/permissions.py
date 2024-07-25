@@ -6,14 +6,11 @@ from properties.models import Property
 
 class IsNotPropertyOwner(BasePermission):
     def has_permission(self, request, view):
-        property_id = view.kwargs.get("id")
+        property_id = request.data.get("property")
         if not property_id:
             return False
 
-        try:
-            property = Property.objects.get(id=property_id)
-        except Property.DoesNotExist:
-            return False
+        property = get_object_or_404(Property, id=property_id)
 
         return property.owner != request.user
 

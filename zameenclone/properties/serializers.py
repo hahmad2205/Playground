@@ -20,27 +20,22 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 
 class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
+    state = serializers.ChoiceField(choices=[
+        (MobileState.ACCEPTED, 'Accepted'),
+        (MobileState.REJECTED, 'Rejected')
+    ])
+
     class Meta:
         model = PropertyOffers
         fields = ["id", "state"]
 
-    def validate(self, attrs):
-        state = attrs.get("state")
-        if state not in [MobileState.ACCEPTED, MobileState.REJECTED]:
-            raise ValidationError("Invalid state value provided.")
-
-        return attrs
-
     def update(self, instance, validated_data):
         state = validated_data.get("state")
         if state == MobileState.ACCEPTED:
-            message = instance.mark_accepted()
+            instance.mark_accepted()
         elif state == MobileState.REJECTED:
-            message = instance.mark_rejected()
-        else:
-            raise ValidationError("Invalid state value provided.")
-
-        instance.save(update_fields=['state', 'modified'])
+            instance.mark_rejected()
+        instance.save()
         return instance
 
 
@@ -51,31 +46,29 @@ class PropertyOfferWithdrawSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.is_active = False
-        instance.save(update_fields=["is_active", "modified"])
-        return instance
+        return super().update(instance, validated_data)
 
 
-class PropertyOfferSerializer(serializers.ModelSerializer):
-    
+class PropertyOfferListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = PropertyOffers
         fields = ["id", "price", "offered_by", "property", "is_active", "state"]
-        read_only_fields = ["offered_by", "property"]
 
-    def validate(self, attrs):
-        property_id = self.context["view"].kwargs.get("id")
-        if not property_id:
-            raise serializers.ValidationError("Property ID is required.")
 
-        try:
-            property = Property.objects.active().get(id=property_id)
-        except Property.DoesNotExist:
-            raise serializers.ValidationError("Property does not exist or is not available.")
+class PropertyOfferSerializer(serializers.ModelSerializer):
+    property = serializers.PrimaryKeyRelatedField(
+        queryset=Property.objects.active()
+    )
 
-        attrs["property"] = property
-        attrs["offered_by"] = self.context.get("request").user
+    class Meta:
+        model = PropertyOffers
+        fields = ["id", "price", "offered_by", "property", "is_active", "state"]
+        read_only_fields = ["offered_by"]
 
-        return attrs
+    def create(self, validated_data):
+        validated_data["offered_by"] = self.context["request"].user
+        return super().create(validated_data)
 
 
 class PropertyAmenitySerializer(serializers.ModelSerializer):

@@ -3,6 +3,9 @@ from django.urls import path
 from properties.views import simple_views
 # from properties.views.api_views import *
 from properties.views.generic_api_views import *
+
+
+
 urlpatterns = [
     # simple views
     path("marketplace/", simple_views.marketplace, name="marketplace"),
@@ -31,16 +34,15 @@ urlpatterns = [
     path("generic-api/marketplace/", PropertyMarketplaceListAPIView.as_view(), name="marketplace_generic_api"),
     path("generic-api/<int:pk>", PropertyDetailAPIView.as_view(), name="property"),
     path("generic-api/", PropertyListAPIView.as_view(), name="properties_generic_api"),
-    path("generic-api/<int:id>/create-offer/", PropertyOfferCreateAPIView.as_view(), name="create_offer_generic_api"),
-    path("generic-api/offers/", PropertyOfferListAPIView.as_view(), name="get_offers_generic_api"),
+    path("generic-api/offer/create/", PropertyOfferCreateAPIView.as_view(), name="create_offer_generic_api"),
     path(
         "generic-api/<int:pk>/offers/",
         PropertyOfferFromPropertyListAPIView.as_view(),
         name="get_property_offers_generic_api"
     ),
+    path("generic-api/offers/", PropertyOfferListAPIView.as_view(), name="get_offers_generic_api"),
     path("generic-api/update-offers/<int:pk>/", PropertyOfferUpdateStateAPIView.as_view(), name="update_state"),
     path("generic-api/offers/withdraw/<int:pk>/", PropertyOfferWithdrawAPIView.as_view(), name="withdraw_offer_api"),
     path("generic-api/<int:pk>/update", PropertyUpdateAPIView.as_view(), name="update_property"),
     path("generic-api/add/", PropertyCreateAPIView.as_view(), name="add_property")
 ]
-
