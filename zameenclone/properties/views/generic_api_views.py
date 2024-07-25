@@ -6,7 +6,6 @@ from rest_framework.generics import (
     RetrieveAPIView
 )
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 from properties.models import Property, PropertyOffers, PropertyAmenity, PropertyImages
 from properties.serializers import (

@@ -1,8 +1,6 @@
 from django.shortcuts import get_object_or_404
-
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from properties.utils import save_images, save_amenities
