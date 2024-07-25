@@ -34,7 +34,7 @@ class PropertyListMixin(ListAPIView):
     pagination_class = CustomPagination
     search_fields = ["title", "location"]
     ordering_fields = ["pk", "price"]
-    ordering = ["price"]
+    ordering = ["pk"]
 
 
 class PropertyMarketplaceListAPIView(PropertyListMixin):
