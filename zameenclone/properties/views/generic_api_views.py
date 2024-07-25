@@ -25,13 +25,15 @@ from properties.permissions import (
     IsOfferOwner
 )
 from properties.enums import MobileState
+from core.pagination import CustomPagination
 
 
 class PropertyListMixin(ListAPIView):
     serializer_class = PropertyListDetailSerializer
     filterset_class = PropertyFilter
+    pagination_class = CustomPagination
     search_fields = ["title", "location"]
-    ordering_fields = ["pk","price"]
+    ordering_fields = ["pk", "price"]
     ordering = ["price"]
 
 
@@ -67,6 +69,7 @@ class PropertyOfferCreateAPIView(CreateAPIView):
 
 class PropertyOfferListAPIView(ListAPIView):
     serializer_class = PropertyOfferListSerializer
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         return PropertyOffers.objects.active().filter(property__owner=self.request.user, state=MobileState.PENDING.value)
@@ -76,6 +79,7 @@ class PropertyOfferFromPropertyListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated, IsPropertyOwner]
     queryset = PropertyOffers.objects.active().filter(state=MobileState.PENDING.value)
     serializer_class = PropertyOfferListSerializer
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         return (
