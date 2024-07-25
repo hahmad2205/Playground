@@ -69,6 +69,13 @@ class PropertyOfferSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class PropertyAmenityCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PropertyAmenity
+        fields = ["id", "amenity", "value", "property"]
+
+
 class PropertyAmenitySerializer(serializers.ModelSerializer):
     amenity = AmenityOptionSerializer()
 
@@ -77,11 +84,11 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
         fields = ["id", "amenity", "value", "property"]
         read_only_fields = ["property", "amenity"]
 
-    def create(self, validated_data):
-        amenity_data = validated_data.pop("amenity")
-        amenity = get_object_or_404(AmenityOption, pk=amenity_data.get("option"))
-        validated_data["amenity"] = amenity
-        return super().create(validated_data)
+    # def create(self, validated_data):
+    #     amenity_data = validated_data.pop("amenity")
+    #     amenity = get_object_or_404(AmenityOption, pk=amenity_data.get("option"))
+    #     validated_data["amenity"] = amenity
+    #     return super().create(validated_data)
 
 
 class PropertyListDetailSerializer(serializers.ModelSerializer):
@@ -123,7 +130,7 @@ class PropertySerializer(serializers.ModelSerializer):
             save_images(images, property)
             save_amenities(amenities, property)
 
-        return property
+            return property
 
 
 class PropertyImagesAmenitiesUpdateSerializer(serializers.Serializer):
