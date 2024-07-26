@@ -73,11 +73,12 @@ class PropertyImages(SoftdeleteModelMixin):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
 
     objects = RetrieveImagesManager()
+
     def save(self, *args, **kwargs):
         if self.image and not self.image_url:
             self.image_url = f"{settings.MEDIA_URL}property_images/{self.image.name}"
         super().save(*args, **kwargs)
-        
+
     def __str__(self):
         return self.property.title
 

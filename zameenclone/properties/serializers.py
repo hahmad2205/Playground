@@ -83,7 +83,8 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
 
 
 class PropertyListDetailSerializer(serializers.ModelSerializer):
-    images = PropertyImageSerializer(many=True)
+    # images = PropertyImageSerializer(many=True)
+    image_url = serializers.SerializerMethodField()
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
     owner = UserSerializer()
@@ -92,11 +93,15 @@ class PropertyListDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
-            "id", "images", "amenities", "owner", "is_active", "offers",
+            "id", "amenities", "owner", "is_active", "offers",
             "area", "description", "header", "location", "purpose", "title",
             "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
-            "is_sold", "offer_count"
+            "is_sold", "offer_count", "image_url"
         ]
+
+    def get_image_url(self, obj):
+        image = obj.images.first()
+        return PropertyImageSerializer(image).data["image_url"] if image else None
 
 
 class PropertySerializer(serializers.ModelSerializer):

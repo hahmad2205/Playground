@@ -39,7 +39,6 @@ class PropertyMarketplaceListAPIView(PropertyListMixin):
     queryset = (
         Property.objects.active().
         prefetch_related(
-            Prefetch("images", queryset=PropertyImages.objects.active()),
             Prefetch("amenities", queryset=PropertyAmenity.objects.active()),
             Prefetch("offers", queryset=PropertyOffers.objects.active())
         ).
@@ -52,7 +51,6 @@ class PropertyListAPIView(PropertyListMixin):
         return (
             Property.objects.active().filter(owner=self.request.user).
             prefetch_related(
-                Prefetch("images", queryset=PropertyImages.objects.active()),
                 Prefetch("amenities", queryset=PropertyAmenity.objects.active()),
                 Prefetch("offers", queryset=PropertyOffers.objects.active())
             ).
