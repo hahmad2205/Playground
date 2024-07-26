@@ -9,7 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from properties.models import Property, PropertyOffers, PropertyAmenity, PropertyImages
 from properties.serializers import (
-    PropertyListDetailSerializer,
+    PropertyListSerializer,
+    PropertyDetailSerializer,
     PropertyOfferSerializer,
     PropertyOfferListSerializer,
     PropertyOfferUpdateSerializer,
@@ -28,7 +29,7 @@ from properties.enums import MobileState
 
 
 class PropertyListMixin(ListAPIView):
-    serializer_class = PropertyListDetailSerializer
+    serializer_class = PropertyListSerializer
     filterset_class = PropertyFilter
     search_fields = ["title", "location"]
     ordering_fields = ["pk", "price"]
@@ -90,7 +91,7 @@ class PropertyOfferUpdateStateAPIView(UpdateAPIView):
 
 
 class PropertyDetailAPIView(RetrieveAPIView):
-    serializer_class = PropertyListDetailSerializer
+    serializer_class = PropertyDetailSerializer
     queryset = Property.objects.active().annotate(offer_count=Count("offers"))
 
 

@@ -82,8 +82,24 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
         read_only_fields = ["property", "amenity"]
 
 
-class PropertyListDetailSerializer(serializers.ModelSerializer):
-    # images = PropertyImageSerializer(many=True)
+class PropertyDetailSerializer(serializers.ModelSerializer):
+    images = PropertyImageSerializer(many=True)
+    amenities = PropertyAmenitySerializer(many=True)
+    offers = PropertyOfferSerializer(many=True)
+    owner = UserSerializer()
+    offer_count = serializers.IntegerField()
+
+    class Meta:
+        model = Property
+        fields = [
+            "id", "images", "amenities", "owner", "is_active", "offers",
+            "area", "description", "header", "location", "purpose", "title",
+            "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
+            "is_sold", "offer_count"
+        ]
+
+
+class PropertyListSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
