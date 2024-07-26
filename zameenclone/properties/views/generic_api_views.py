@@ -1,4 +1,4 @@
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -43,7 +43,7 @@ class PropertyMarketplaceListAPIView(PropertyListMixin):
             Prefetch("amenities", queryset=PropertyAmenity.objects.active()),
             Prefetch("offers", queryset=PropertyOffers.objects.active())
         ).
-        select_related("owner")
+        select_related("owner").annotate(offer_count=Count("offers"))
     )
 
 
@@ -56,7 +56,7 @@ class PropertyListAPIView(PropertyListMixin):
                 Prefetch("amenities", queryset=PropertyAmenity.objects.active()),
                 Prefetch("offers", queryset=PropertyOffers.objects.active())
             ).
-            select_related("owner")
+            select_related("owner").annotate(offer_count=Count("offers"))
         )
 
 
@@ -69,7 +69,9 @@ class PropertyOfferListAPIView(ListAPIView):
     serializer_class = PropertyOfferListSerializer
 
     def get_queryset(self):
-        return PropertyOffers.objects.active().filter(property__owner=self.request.user, state=MobileState.PENDING.value)
+        return PropertyOffers.objects.active().filter(
+            property__owner=self.request.user, state=MobileState.PENDING.value
+        )
 
 
 class PropertyOfferFromPropertyListAPIView(ListAPIView):
@@ -91,7 +93,7 @@ class PropertyOfferUpdateStateAPIView(UpdateAPIView):
 
 class PropertyDetailAPIView(RetrieveAPIView):
     serializer_class = PropertyListDetailSerializer
-    queryset = Property.objects.active()
+    queryset = Property.objects.active().annotate(offer_count=Count("offers"))
 
 
 class PropertyOfferWithdrawAPIView(UpdateAPIView):

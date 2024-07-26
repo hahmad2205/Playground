@@ -6,6 +6,7 @@ from properties.utils import save_images, save_amenities
 from properties.enums import MobileState
 from core.serializers import AmenityOptionSerializer
 from users.serializers import UserSerializer
+from users.models import User
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -45,22 +46,23 @@ class PropertyOfferListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PropertyOffers
-        fields = ["id", "price", "offered_by", "property", "is_active", "state"]
+        fields = ["id", "price", "offered_by", "property", "is_active", "state", "offer_count"]
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
     property = serializers.PrimaryKeyRelatedField(
         queryset=Property.objects.active()
     )
-
+    offered_by = serializers.PrimaryKeyRelatedField(
+        default=serializers.CurrentUserDefault(),
+        queryset=User.objects.filter(is_active=True),
+    )
 
     class Meta:
         model = PropertyOffers
         fields = ["id", "price", "offered_by", "property", "is_active", "state"]
-        read_only_fields = ["offered_by"]
 
     def create(self, validated_data):
-        validated_data["offered_by"] = self.context["request"].user
         return super().create(validated_data)
 
 
@@ -85,6 +87,7 @@ class PropertyListDetailSerializer(serializers.ModelSerializer):
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
     owner = UserSerializer()
+    offer_count = serializers.IntegerField()
 
     class Meta:
         model = Property
@@ -92,7 +95,7 @@ class PropertyListDetailSerializer(serializers.ModelSerializer):
             "id", "images", "amenities", "owner", "is_active", "offers",
             "area", "description", "header", "location", "purpose", "title",
             "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
-            "is_sold"
+            "is_sold", "offer_count"
         ]
 
 
