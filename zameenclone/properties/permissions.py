@@ -7,22 +7,14 @@ from properties.models import Property
 class IsNotPropertyOwner(BasePermission):
     def has_permission(self, request, view):
         property_id = request.data.get("property")
-        if not property_id:
-            return False
-
         property = get_object_or_404(Property, id=property_id)
 
-        return property.owner != request.user
+        return not property.owner == request.user
 
 
 class IsOfferOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.offered_by == request.user
-
-
-class IsNotOfferOwnerAndPropertyOwner(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.offered_by != request.user and obj.property.owner == request.user
 
 
 class IsPropertyOwner(BasePermission):

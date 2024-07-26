@@ -46,7 +46,7 @@ class PropertyOfferListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PropertyOffers
-        fields = ["id", "price", "offered_by", "property", "is_active", "state", "offer_count"]
+        fields = ["id", "price", "offered_by", "property", "is_active", "state"]
 
 
 class PropertyOfferSerializer(serializers.ModelSerializer):
@@ -61,9 +61,6 @@ class PropertyOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyOffers
         fields = ["id", "price", "offered_by", "property", "is_active", "state"]
-
-    def create(self, validated_data):
-        return super().create(validated_data)
 
 
 class PropertyAmenityCreateSerializer(serializers.ModelSerializer):
@@ -103,7 +100,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
-    owner = UserSerializer()
+    owner = serializers.CharField(source="owner.get_full_name")
     offer_count = serializers.IntegerField()
 
     class Meta:
@@ -117,7 +114,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         image = obj.images.first()
-        return PropertyImageSerializer(image).data["image_url"] if image else None
+        return image.image_url if image else None
 
 
 class PropertySerializer(serializers.ModelSerializer):

@@ -1,4 +1,5 @@
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, Q
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -7,7 +8,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 
-from properties.models import Property, PropertyOffers, PropertyAmenity, PropertyImages
+from properties.models import Property, PropertyOffers, PropertyAmenity
 from properties.serializers import (
     PropertyListSerializer,
     PropertyDetailSerializer,
@@ -18,11 +19,10 @@ from properties.serializers import (
     PropertyUpdateSerializer,
     PropertySerializer
 )
-from properties.filters import PropertyFilter
+from properties.filters import PropertyFilter, PropertyOfferStateFilter
 from properties.permissions import (
     IsNotPropertyOwner,
     IsPropertyOwner,
-    IsNotOfferOwnerAndPropertyOwner,
     IsOfferOwner
 )
 from properties.enums import MobileState
@@ -55,7 +55,16 @@ class PropertyListAPIView(PropertyListMixin):
                 Prefetch("amenities", queryset=PropertyAmenity.objects.active()),
                 Prefetch("offers", queryset=PropertyOffers.objects.active())
             ).
-            select_related("owner").annotate(offer_count=Count("offers"))
+            select_related("owner").annotate(
+                offer_count=
+                Count(
+                    "offers",
+                    filter=(
+                        Q(offers__is_active=True) &
+                        Q(offers__state=MobileState.PENDING)
+                    )
+                )
+            )
         )
 
 
@@ -66,26 +75,25 @@ class PropertyOfferCreateAPIView(CreateAPIView):
 
 class PropertyOfferListAPIView(ListAPIView):
     serializer_class = PropertyOfferListSerializer
+    filterset_class = PropertyOfferStateFilter
 
     def get_queryset(self):
-        return PropertyOffers.objects.active().filter(
-            property__owner=self.request.user, state=MobileState.PENDING.value
+        return PropertyOffers.objects.filter(
+            property__owner=self.request.user
         )
 
 
 class PropertyOfferFromPropertyListAPIView(ListAPIView):
     permission_classes = [IsAuthenticated, IsPropertyOwner]
     serializer_class = PropertyOfferListSerializer
-    queryset = PropertyOffers.objects.active().filter(state=MobileState.PENDING.value)
 
     def get_queryset(self):
-        return (
-            PropertyOffers.objects.active().filter(property=self.kwargs["pk"])
-        )
+        property = get_object_or_404(Property, pk=self.kwargs["pk"])
+        return property.offers.active()
 
 
 class PropertyOfferUpdateStateAPIView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsNotOfferOwnerAndPropertyOwner]
+    permission_classes = [IsAuthenticated, IsPropertyOwner]
     serializer_class = PropertyOfferUpdateSerializer
     queryset = PropertyOffers.objects.active()
 
@@ -109,4 +117,3 @@ class PropertyUpdateAPIView(UpdateAPIView):
 
 class PropertyCreateAPIView(CreateAPIView):
     serializer_class = PropertySerializer
-
