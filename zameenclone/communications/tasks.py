@@ -20,10 +20,10 @@ def send_email(**kwargs):
 
 
 @shared_task()
-def send_email_on_offer(instance, state):
+def send_email_on_offer_state_update(instance):
     email_template = render_to_string(
         "communication/offer_state_update.html",
-        context={"property_title": instance.property.title, "state": state}
+        context={"property_title": instance.property.title, "state": instance.state}
     )
     email_data = {
         "email_to": [instance.property.owner.email],
@@ -32,4 +32,3 @@ def send_email_on_offer(instance, state):
     }
     send_email(**email_data)
 
-    pass

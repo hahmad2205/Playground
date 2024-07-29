@@ -27,7 +27,7 @@ from properties.permissions import (
     IsOfferPropertyOwner
 )
 from properties.enums import MobileState
-from communication.tasks import send_email_on_offer
+from communications.tasks import send_email_on_offer_state_update
 
 
 class PropertyListMixin(ListAPIView):
@@ -100,10 +100,8 @@ class PropertyOfferUpdateStateAPIView(UpdateAPIView):
     queryset = PropertyOffers.objects.active()
 
     def perform_update(self, serializer):
-        instance = self.get_object()
-        state = self.request.data.get("state")
-        serializer.save()
-        send_email_on_offer(instance, state)
+        instance = serializer.save()
+        send_email_on_offer_state_update.delay(instance)
 
 
 class PropertyDetailAPIView(RetrieveAPIView):
