@@ -23,9 +23,11 @@ from properties.filters import PropertyFilter
 from properties.permissions import (
     IsNotPropertyOwner,
     IsPropertyOwner,
-    IsOfferOwner
+    IsOfferOwner,
+    IsOfferPropertyOwner
 )
 from properties.enums import MobileState
+from communications.tasks import send_email_on_offer_state_update
 
 
 class PropertyListMixin(ListAPIView):
@@ -93,9 +95,13 @@ class PropertyOfferFromPropertyListAPIView(ListAPIView):
 
 
 class PropertyOfferUpdateStateAPIView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsPropertyOwner]
+    permission_classes = [IsAuthenticated, IsOfferPropertyOwner]
     serializer_class = PropertyOfferUpdateSerializer
     queryset = PropertyOffers.objects.active()
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        send_email_on_offer_state_update.delay(instance)
 
 
 class PropertyDetailAPIView(RetrieveAPIView):

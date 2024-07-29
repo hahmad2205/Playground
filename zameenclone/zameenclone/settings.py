@@ -17,7 +17,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = 'django-insecure-h2my@t(c!6(tkcvwu)($!equr)01b+&bh#bla8burc%=3cmwtl
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 DEAFAULT_APPS = [
@@ -44,6 +42,7 @@ CUSTOM_APPS = [
     'users.apps.UsersConfig',
     'properties.apps.PropertiesConfig',
     'core.apps.CoreConfig',
+    'communications.apps.CommunicationConfig'
 ]
 
 THIRD_PARTY_APPS = [
@@ -104,7 +103,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'zameenclone.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -114,7 +112,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -134,7 +131,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -145,7 +141,6 @@ TIME_ZONE = 'Asia/Karachi'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -173,3 +168,13 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=3),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
 }
+
+# sendgrid
+from decouple import config
+
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+SENDER_EMAIL_ADDRESS = config("SENDER_EMAIL_ADDRESS")
+SENDGRID_API_KEY = config("SENDGRID_API_KEY")
+CELERY_BROKER_URL = config("CELERY_BROKER_URL")
+# EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
