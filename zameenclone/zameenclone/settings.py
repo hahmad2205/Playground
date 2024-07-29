@@ -42,7 +42,6 @@ CUSTOM_APPS = [
     'users.apps.UsersConfig',
     'properties.apps.PropertiesConfig',
     'core.apps.CoreConfig',
-    'communication.apps.CommunicationConfig'
 ]
 
 THIRD_PARTY_APPS = [
