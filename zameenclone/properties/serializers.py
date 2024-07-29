@@ -8,6 +8,7 @@ from core.serializers import AmenityOptionSerializer
 from users.models import User
 from properties.tasks import send_email
 
+
 class PropertyImageSerializer(serializers.ModelSerializer):
     
     class Meta:
