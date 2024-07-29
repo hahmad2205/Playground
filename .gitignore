@@ -5,6 +5,7 @@ zameenclone/users/__pycache__
 zameenclone/properties/__pycache__
 zameenclone/core/__pycache__
 zameenclone/properties/management/commands/__pycache__
+zameenclone/communication/__pycache__
 zameenclone/data
 __pycache__/
 *.pyc
