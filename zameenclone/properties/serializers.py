@@ -6,7 +6,6 @@ from properties.utils import save_images, save_amenities
 from properties.enums import MobileState
 from core.serializers import AmenityOptionSerializer
 from users.models import User
-from properties.tasks import send_email
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -29,11 +28,6 @@ class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
         state = validated_data.get("state")
         instance.mark_accepted() if state == MobileState.ACCEPTED else instance.mark_rejected()
         instance.save(update_fields=["state", "modified"])
-        send_email.delay(
-            [instance.property.owner.email],
-            "Offer State",
-            f"Your offer on property {instance.property.title} is {state}"
-        )
         return instance
 
 
