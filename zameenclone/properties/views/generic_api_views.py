@@ -19,7 +19,7 @@ from properties.serializers import (
     PropertyUpdateSerializer,
     PropertySerializer
 )
-from properties.filters import PropertyFilter, PropertyOfferStateFilter
+from properties.filters import PropertyFilter
 from properties.permissions import (
     IsNotPropertyOwner,
     IsPropertyOwner,

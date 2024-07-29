@@ -96,7 +96,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
 
 
 class PropertyListSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
+    image_url = serializers.URLField(source="images.first.image_url")
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
     owner = serializers.CharField(source="owner.get_full_name")
@@ -110,10 +110,6 @@ class PropertyListSerializer(serializers.ModelSerializer):
             "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
             "is_sold", "offer_count", "image_url"
         ]
-
-    def get_image_url(self, obj):
-        image = obj.images.first()
-        return image.image_url if image else None
 
 
 class PropertySerializer(serializers.ModelSerializer):
