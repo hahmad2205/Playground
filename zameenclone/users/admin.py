@@ -19,5 +19,7 @@ class UserAdmin(DjangoUserAdmin):
             "fields": ("first_name", "last_name", "email", "username", "password1", "password2"),
         }),
     )
+    search_fields = ["id"]
+
 
 admin.site.register(User, UserAdmin)

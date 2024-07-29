@@ -1,16 +1,20 @@
-from typing import Any
 from django.db import models, transaction
 from django.db.models import Prefetch
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-import django_filters
 from django_fsm import FSMField, transition
 
 from core.models import AmenityOption, SoftdeleteModelMixin
 from .enums import MobileState
 
 User = get_user_model()
+
+
+class ActiveManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True, is_sold=False)
+
 
 class Property(SoftdeleteModelMixin):
     area = models.PositiveSmallIntegerField()
@@ -29,6 +33,8 @@ class Property(SoftdeleteModelMixin):
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name="amenities")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
 
+    objects = ActiveManager()
+    
     def get_first_image(self):
         return self.images.first()
         
@@ -55,26 +61,9 @@ class Property(SoftdeleteModelMixin):
         return self.title
 
 
-class PropertyFilter(django_filters.FilterSet):
-    price = django_filters.NumberFilter()
-    price__gt = django_filters.NumberFilter(field_name="price", lookup_expr="gt")
-    price__lt = django_filters.NumberFilter(field_name="price", lookup_expr="lt")
-
-    number_of_bed = django_filters.NumberFilter()
-    number_of_bed__gt = django_filters.NumberFilter(field_name="number_of_bed", lookup_expr="gt")
-    number_of_bed__lt = django_filters.NumberFilter(field_name="number_of_bed", lookup_expr="lt")
-    
-    number_of_bath = django_filters.NumberFilter()
-    number_of_bath__gt = django_filters.NumberFilter(field_name="number_of_bath", lookup_expr="gt")
-    number_of_bath__gt = django_filters.NumberFilter(field_name="number_of_bath", lookup_expr="gt")
-    
-    area = django_filters.NumberFilter()
-    area__gt = django_filters.NumberFilter(field_name="area", lookup_expr="gt")
-    area__lt = django_filters.NumberFilter(field_name="area", lookup_expr="lt")
-
-    class Meta:
-        model = Property
-        fields = ["price", "number_of_bed", "number_of_bath", "area"]
+class RetrieveImagesManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True)
 
 
 class PropertyImages(SoftdeleteModelMixin):
@@ -82,46 +71,65 @@ class PropertyImages(SoftdeleteModelMixin):
     image = models.ImageField(upload_to='property_images/')
     
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
-    
+
+    objects = RetrieveImagesManager()
+
     def save(self, *args, **kwargs):
         if self.image and not self.image_url:
             self.image_url = f"{settings.MEDIA_URL}property_images/{self.image.name}"
         super().save(*args, **kwargs)
-        
+
     def __str__(self):
         return self.property.title
+
+
+class RetrieveOffersManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True)
 
 
 class PropertyOffers(SoftdeleteModelMixin):
     price = models.PositiveIntegerField()
     state = FSMField(default=MobileState.PENDING, protected=True, choices=MobileState.choices)
-
+    
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
+    
+    objects = RetrieveOffersManager()
     
     def __str__(self):
         return f"{self.property.title} - {self.price}"
     
-    def delete(self, using: Any = ..., keep_parents: bool = ...) -> tuple[int, dict[str, int]]:
+    def delete(self):
         self.is_active = False
         self.save()
     
     @transition(field="state", source=MobileState.PENDING, target=MobileState.ACCEPTED)
     def mark_accepted(self):
         self.property.is_active = False
+        self.property.is_sold = True
+        self.property.save(update_fields=["is_active"])
+        self.is_active = False
         other_offers = self.__class__.objects.filter(
             property=self.property,
             state=MobileState.PENDING
         ).exclude(id=self.id)
 
         with transaction.atomic():
-            other_offers.update(state=MobileState.REJECTED)
+            other_offers.update(state=MobileState.REJECTED, is_active=False)
 
         return "Offer switched to accepted!"
     
     @transition(field="state", source=MobileState.PENDING, target=MobileState.REJECTED)
     def mark_rejected(self):
+        self.is_active = False
         return "Offer switched to rejected!"
+
+
+class RetrieveAmenitiesManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True)
+
 
 class PropertyAmenity(SoftdeleteModelMixin):
     value = models.PositiveIntegerField(null=True, blank=True)
@@ -129,5 +137,8 @@ class PropertyAmenity(SoftdeleteModelMixin):
     amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name="options")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_amenities")
 
+    objects = RetrieveAmenitiesManager()
+
     def __str__(self):
         return f"{self.property} | ID: {self.id}"
+
