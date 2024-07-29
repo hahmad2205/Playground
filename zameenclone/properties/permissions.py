@@ -23,3 +23,9 @@ class IsPropertyOwner(BasePermission):
 
         return property.owner == request.user
 
+
+class IsOfferPropertyOwner(BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        return obj.property.owner == request.user
+

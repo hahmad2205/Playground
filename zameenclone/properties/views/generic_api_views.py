@@ -23,7 +23,8 @@ from properties.filters import PropertyFilter
 from properties.permissions import (
     IsNotPropertyOwner,
     IsPropertyOwner,
-    IsOfferOwner
+    IsOfferOwner,
+    IsOfferPropertyOwner
 )
 from properties.enums import MobileState
 
@@ -93,7 +94,7 @@ class PropertyOfferFromPropertyListAPIView(ListAPIView):
 
 
 class PropertyOfferUpdateStateAPIView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsPropertyOwner]
+    permission_classes = [IsAuthenticated, IsOfferPropertyOwner]
     serializer_class = PropertyOfferUpdateSerializer
     queryset = PropertyOffers.objects.active()
 
