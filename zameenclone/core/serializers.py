@@ -17,3 +17,11 @@ class AmenityOptionSerializer(serializers.ModelSerializer):
         model = AmenityOption
         fields = ["id", "amenity", "option"]
 
+
+class AmenityOptionListSerializer(serializers.ModelSerializer):
+    amenity = AmenitySerializer()
+
+    class Meta:
+        model = AmenityOption
+        fields = ["id", "amenity", "option"]
+

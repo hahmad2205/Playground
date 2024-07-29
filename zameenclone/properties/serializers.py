@@ -1,12 +1,11 @@
-from django.shortcuts import get_object_or_404
-
 from django.db import transaction
 from rest_framework import serializers
 
 from properties.models import Property, PropertyImages, PropertyOffers, PropertyAmenity
 from properties.utils import save_images, save_amenities
+from properties.enums import MobileState
 from core.serializers import AmenityOptionSerializer
-from core.models import AmenityOption
+from users.models import User
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -16,11 +15,58 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image_url", "property"]
 
 
-class PropertyOfferSerializer(serializers.ModelSerializer):
-    
+class PropertyOfferUpdateSerializer(serializers.ModelSerializer):
+    state = serializers.ChoiceField(
+        choices=[MobileState.ACCEPTED, MobileState.REJECTED]
+    )
+
+    class Meta:
+        model = PropertyOffers
+        fields = ["id", "state"]
+
+    def update(self, instance, validated_data):
+        state = validated_data.get("state")
+        instance.mark_accepted() if state == MobileState.ACCEPTED else instance.mark_rejected()
+        instance.save(update_fields=["state", "modified"])
+        return instance
+
+
+class PropertyOfferWithdrawSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyOffers
+        fields = ["id", "is_active"]
+
+    def update(self, instance, validated_data):
+        instance.is_active = False
+        return super().update(instance, validated_data)
+
+
+class PropertyOfferListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = PropertyOffers
         fields = ["id", "price", "offered_by", "property", "is_active", "state"]
+
+
+class PropertyOfferSerializer(serializers.ModelSerializer):
+    property = serializers.PrimaryKeyRelatedField(
+        queryset=Property.objects.active()
+    )
+    offered_by = serializers.PrimaryKeyRelatedField(
+        default=serializers.CurrentUserDefault(),
+        queryset=User.objects.filter(is_active=True),
+    )
+
+    class Meta:
+        model = PropertyOffers
+        fields = ["id", "price", "offered_by", "property", "is_active", "state"]
+
+
+class PropertyAmenityCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PropertyAmenity
+        fields = ["id", "amenity", "value", "property"]
 
 
 class PropertyAmenitySerializer(serializers.ModelSerializer):
@@ -29,13 +75,41 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyAmenity
         fields = ["id", "amenity", "value", "property"]
+        read_only_fields = ["property", "amenity"]
 
-    def create(self, validated_data):
-        amenity_data = validated_data.pop('amenity')
-        amenity = get_object_or_404(AmenityOption, pk=amenity_data.get("option"))
-        validated_data["amenity"] = amenity
-        property_amenity = super().create(validated_data)
-        return property_amenity
+
+class PropertyDetailSerializer(serializers.ModelSerializer):
+    images = PropertyImageSerializer(many=True)
+    amenities = PropertyAmenitySerializer(many=True)
+    offers = PropertyOfferSerializer(many=True)
+    owner = serializers.CharField(source="owner.get_full_name")
+    offer_count = serializers.IntegerField()
+
+    class Meta:
+        model = Property
+        fields = [
+            "id", "images", "amenities", "owner", "is_active", "offers",
+            "area", "description", "header", "location", "purpose", "title",
+            "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
+            "is_sold", "offer_count"
+        ]
+
+
+class PropertyListSerializer(serializers.ModelSerializer):
+    image_url = serializers.URLField(source="images.first.image_url")
+    amenities = PropertyAmenitySerializer(many=True)
+    offers = PropertyOfferSerializer(many=True)
+    owner = serializers.CharField(source="owner.get_full_name")
+    offer_count = serializers.IntegerField()
+
+    class Meta:
+        model = Property
+        fields = [
+            "id", "amenities", "owner", "is_active", "offers",
+            "area", "description", "header", "location", "purpose", "title",
+            "number_of_bath", "number_of_bed", "price", "type", "whatsapp_number",
+            "is_sold", "offer_count", "image_url"
+        ]
 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -69,7 +143,7 @@ class PropertyImagesAmenitiesUpdateSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
 
     def update(self, instance, validated_data):
-        instance.is_active = validated_data.get('is_active', instance.is_active)
+        instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
         return instance
 

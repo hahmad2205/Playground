@@ -19,7 +19,7 @@ class PropertyMarketplaceListAPIView(APIView):
             .prefetch_related("images", "amenities", "offers", "owner")
         )
         
-        return Response(data=get_serialized_data(request, queryset))
+        return Response(data=get_serialized_data(self, request, queryset))
 
 
 class PropertyListAPIView(APIView):
@@ -75,16 +75,8 @@ class PropertyOfferUpdateStateAPIView(APIView):
 
         serializer = PropertyOfferSerializer(offer, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-
-        state = request.data.get("state")
-        if state == MobileState.ACCEPTED:
-            message = offer.mark_accepted()
-        elif state == MobileState.REJECTED:
-            message = offer.mark_rejected()
         
-        offer.save(update_fields=["state", "is_active", "property", "modified"])
-        
-        return Response({"message": message})
+        return Response(serializer.data)
 
 
 class PropertyOfferWithdrawAPIView(APIView):

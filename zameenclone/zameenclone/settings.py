@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
     'django_fsm',
     'rest_framework',
     'rest_framework_simplejwt',
+    'silk'
 ]
 
 REST_FRAMEWORK = {
@@ -61,6 +62,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
 
 INSTALLED_APPS = DEAFAULT_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
@@ -73,6 +81,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'zameenclone.urls'

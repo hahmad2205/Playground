@@ -9,3 +9,4 @@ djangorestframework-simplejwt
 
 Django~=5.0.6
 django-filter~=24.2
+django-silk

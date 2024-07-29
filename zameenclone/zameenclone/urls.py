@@ -4,8 +4,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     path("", include("users.urls")),
     path("properties/", include("properties.urls")),
-    path('core/', include('core.urls'))
+    path("core/", include("core.urls")),
+    path("silk/", include("silk.urls", namespace="silk"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

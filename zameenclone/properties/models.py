@@ -61,24 +61,31 @@ class Property(SoftdeleteModelMixin):
         return self.title
 
 
+class RetrieveImagesManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True)
+
+
 class PropertyImages(SoftdeleteModelMixin):
     image_url = models.URLField(blank=True, null=True)
     image = models.ImageField(upload_to='property_images/')
     
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="images")
-    
+
+    objects = RetrieveImagesManager()
+
     def save(self, *args, **kwargs):
         if self.image and not self.image_url:
             self.image_url = f"{settings.MEDIA_URL}property_images/{self.image.name}"
         super().save(*args, **kwargs)
-        
+
     def __str__(self):
         return self.property.title
 
 
-class RetreiveOffersManager(models.Manager):
+class RetrieveOffersManager(models.Manager):
     def active(self):
-        return self.filter(is_active=True, state=MobileState.PENDING.value)
+        return self.filter(is_active=True)
 
 
 class PropertyOffers(SoftdeleteModelMixin):
@@ -88,7 +95,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
     
-    objects = RetreiveOffersManager()
+    objects = RetrieveOffersManager()
     
     def __str__(self):
         return f"{self.property.title} - {self.price}"
@@ -100,6 +107,7 @@ class PropertyOffers(SoftdeleteModelMixin):
     @transition(field="state", source=MobileState.PENDING, target=MobileState.ACCEPTED)
     def mark_accepted(self):
         self.property.is_active = False
+        self.property.is_sold = True
         self.property.save(update_fields=["is_active"])
         self.is_active = False
         other_offers = self.__class__.objects.filter(
@@ -118,11 +126,18 @@ class PropertyOffers(SoftdeleteModelMixin):
         return "Offer switched to rejected!"
 
 
+class RetrieveAmenitiesManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True)
+
+
 class PropertyAmenity(SoftdeleteModelMixin):
     value = models.PositiveIntegerField(null=True, blank=True)
     
     amenity = models.ForeignKey(AmenityOption, on_delete=models.CASCADE, related_name="options")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_amenities")
+
+    objects = RetrieveAmenitiesManager()
 
     def __str__(self):
         return f"{self.property} | ID: {self.id}"
