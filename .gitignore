@@ -11,4 +11,5 @@ __pycache__/
 *.min.js
 media
 .idea
-zameenclone/,idea
+zameenclone/.idea
+zameenclone/.env
