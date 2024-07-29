@@ -1,11 +1,11 @@
 from django.db.models import Q
-
 from django.core.paginator import Paginator
+
+from rest_framework.pagination import PageNumberPagination
 
 from properties.models import Property
 from properties.filters import PropertyFilter
 from properties.serializers import PropertySerializer
-from core.pagination import CustomPagination
 
 
 def create_pagination(properties, request):
@@ -25,7 +25,7 @@ def get_serialized_data(self, request, queryset):
     filterset = PropertyFilter(request.GET, queryset=queryset)
     if filterset.is_valid:
         queryset = filterset.qs
-    paginator = CustomPagination()
+    paginator = PageNumberPagination()
     paginated_queryset = paginator.paginate_queryset(queryset, request, view=self)
     serializer = PropertySerializer(paginated_queryset, many=True)
     return serializer.data

@@ -1,7 +1,6 @@
 import django_filters
 
-from properties.models import Property, PropertyOffers
-from properties.enums import MobileState
+from properties.models import Property
 
 
 class PropertyFilter(django_filters.FilterSet):
