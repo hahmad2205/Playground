@@ -75,7 +75,7 @@ class PropertyOfferCreateAPIView(CreateAPIView):
 
 class PropertyOfferListAPIView(ListAPIView):
     serializer_class = PropertyOfferListSerializer
-    filterset_class = PropertyOfferStateFilter
+    filterset_fields = ("state",)
 
     def get_queryset(self):
         return PropertyOffers.objects.filter(

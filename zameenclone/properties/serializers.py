@@ -5,7 +5,6 @@ from properties.models import Property, PropertyImages, PropertyOffers, Property
 from properties.utils import save_images, save_amenities
 from properties.enums import MobileState
 from core.serializers import AmenityOptionSerializer
-from users.serializers import UserSerializer
 from users.models import User
 
 
@@ -83,7 +82,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True)
     amenities = PropertyAmenitySerializer(many=True)
     offers = PropertyOfferSerializer(many=True)
-    owner = UserSerializer()
+    owner = serializers.CharField(source="owner.get_full_name")
     offer_count = serializers.IntegerField()
 
     class Meta:
