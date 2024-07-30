@@ -45,7 +45,6 @@ def send_email_to_unsold_property_owner():
         ).values("id", "title", "location", "owner__email")
     )
 
-    property_ids = []
     for unsold_property_owner in unsold_property_owners:
         email_to = [unsold_property_owner["owner__email"]]
         email_template = render_to_string(
@@ -61,6 +60,5 @@ def send_email_to_unsold_property_owner():
             "email_body": email_template
         }
         send_email(**email_data)
-        property_ids.append(unsold_property_owner.get("id"))
 
-    Property.objects.filter(id__in=property_ids).update(email_notification_sent_at=timezone.now())
+    unsold_property_owners.update(email_notification_sent_at=timezone.now())
