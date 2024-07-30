@@ -14,7 +14,11 @@ class SoftdeleteModelMixin(TimeStampedModel):
 
 class Amenity(SoftdeleteModelMixin):
     name = models.CharField(max_length=255, unique=True)
-    
+
+    class Meta:
+        verbose_name = "Property amenity type"
+        verbose_name_plural = "Property amenity types"
+
     def __str__(self):
         return self.name
 

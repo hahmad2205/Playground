@@ -34,7 +34,11 @@ class Property(SoftdeleteModelMixin):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
 
     objects = ActiveManager()
-    
+
+    class Meta:
+        verbose_name = "Property"
+        verbose_name_plural = "Properties"
+
     def get_first_image(self):
         return self.images.first()
         
@@ -74,6 +78,10 @@ class PropertyImages(SoftdeleteModelMixin):
 
     objects = RetrieveImagesManager()
 
+    class Meta:
+        verbose_name = "Property image"
+        verbose_name_plural = "Property images"
+
     def save(self, *args, **kwargs):
         if self.image and not self.image_url:
             self.image_url = f"{settings.MEDIA_URL}property_images/{self.image.name}"
@@ -96,7 +104,11 @@ class PropertyOffers(SoftdeleteModelMixin):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
     
     objects = RetrieveOffersManager()
-    
+
+    class Meta:
+        verbose_name = "Property offer"
+        verbose_name_plural = "Property offers"
+
     def __str__(self):
         return f"{self.property.title} - {self.price}"
     
@@ -138,6 +150,10 @@ class PropertyAmenity(SoftdeleteModelMixin):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_amenities")
 
     objects = RetrieveAmenitiesManager()
+
+    class Meta:
+        verbose_name = "Property amenity"
+        verbose_name_plural = "Property amenities"
 
     def __str__(self):
         return f"{self.property} | ID: {self.id}"
