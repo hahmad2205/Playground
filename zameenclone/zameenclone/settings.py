@@ -51,7 +51,10 @@ THIRD_PARTY_APPS = [
     'django_fsm',
     'rest_framework',
     'rest_framework_simplejwt',
-    'silk'
+    'django_crontab',
+    'silk',
+    'django_celery_results',
+    'django_celery_beat'
 ]
 
 REST_FRAMEWORK = {
@@ -81,6 +84,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'silk.middleware.SilkyMiddleware',
+    'users.middlewares.BlockedUserMiddleware'
 ]
 
 ROOT_URLCONF = 'zameenclone.urls'
@@ -175,6 +179,14 @@ from decouple import config
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 SENDER_EMAIL_ADDRESS = config("SENDER_EMAIL_ADDRESS")
 SENDGRID_API_KEY = config("SENDGRID_API_KEY")
-CELERY_BROKER_URL = config("CELERY_BROKER_URL")
 # EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+#celery
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TIMEZONE = 'Asia/Karachi'
+CELERY_BROKER_URL = config("CELERY_BROKER_URL")
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
