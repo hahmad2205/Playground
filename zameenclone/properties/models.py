@@ -29,7 +29,8 @@ class Property(SoftdeleteModelMixin):
     type = models.CharField(max_length=255, default="house")
     whatsapp_number = models.CharField(max_length=13)
     is_sold = models.BooleanField(default=False)
-    
+    email_sent_date = models.DateTimeField(null=True, blank=True)
+
     amenities = models.ManyToManyField("properties.PropertyAmenity", related_name="amenities")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="properties", null=True, blank=True)
 
