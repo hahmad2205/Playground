@@ -41,10 +41,11 @@ def send_email_on_offer_state_update(instance):
 def send_email_to_unsold_property_owner():
     unsold_property_owners = (
         Property.objects.active().filter(
-            email_sent_date__lte=timezone.now() - timezone.timedelta(days=30)
-        ).values("title", "location", "owner__email")
+            email_notification_sent_at__lte=timezone.now() - timezone.timedelta(days=30)
+        ).values("id", "title", "location", "owner__email")
     )
 
+    property_ids = []
     for unsold_property_owner in unsold_property_owners:
         email_to = [unsold_property_owner["owner__email"]]
         email_template = render_to_string(
@@ -60,3 +61,6 @@ def send_email_to_unsold_property_owner():
             "email_body": email_template
         }
         send_email(**email_data)
+        property_ids.append(unsold_property_owner.get("id"))
+
+    Property.objects.filter(id__in=property_ids).update(email_notification_sent_at=timezone.now())

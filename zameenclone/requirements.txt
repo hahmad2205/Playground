@@ -13,5 +13,3 @@ django-silk
 
 celery~=5.4.0
 sendgrid~=6.11.0
-
-python-dateutil~=2.9.0.post0
