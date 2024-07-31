@@ -24,3 +24,4 @@ urlpatterns = [
     path('', include(router.urls)),
     path('amenity/<int:pk>/options/', AmenityOptionListAPIView.as_view({'get': 'list'}), name='amenity-options'),
 ]
+
