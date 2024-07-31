@@ -84,7 +84,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'silk.middleware.SilkyMiddleware',
-    'users.middlewares.BlockedUserMiddleware'
+    # 'users.middlewares.BlockedUserMiddleware'
 ]
 
 ROOT_URLCONF = 'zameenclone.urls'

@@ -7,31 +7,16 @@ from properties.views import simple_views
 from properties.views.view_sets import *
 
 router = DefaultRouter()
+router.register(r"marketplace", PropertyMarketplaceListAPIView, basename="marketplace")
+router.register(r"offers", PropertyOfferListAPIView, basename='property-offers')
+router.register(r"", PropertyListAPIView, basename="properties")
+# router.register(r"offers/update-state/(?P<pk>\d+)", PropertyOfferUpdateStateAPIView, basename="update_state")
+
 urlpatterns = [
-    path("marketplace/", PropertyMarketplaceListAPIView.as_view({"get": "list"}), name="marketplace_generic_api"),
-    path("", PropertyListAPIView.as_view({"get": "list"}), name="properties"),
-    path("offer/create/", PropertyOfferCreateAPIView.as_view(({"post": "create"})), name="create_offer"),
-    path("offers/", PropertyOfferListAPIView.as_view({"get": "list"}), name="get_offers_generic_api"),
-    path(
-        "<int:pk>/offers/",
-        PropertyOfferFromPropertyListAPIView.as_view({"get": "list"}),
-        name="get_property_offers_generic_api"
-    ),
-    path("<int:pk>", PropertyDetailAPIView.as_view({"get": "retrieve"}), name="property"),
-    path("offers/withdraw/<int:pk>/",
-         PropertyOfferWithdrawAPIView.as_view({"patch": "partial_update"}),
-         name="withdraw_offer_api"),
-    path("add/", PropertyCreateAPIView.as_view({"post": "create"}), name="add_property"),
-    path(
-        "update-offers/<int:pk>/",
-        PropertyOfferUpdateStateAPIView.as_view({"patch": "partial_update"}),
-        name="update_state"
-    ),
-    path(
-        "<int:pk>/update/",
-        PropertyUpdateAPIView.as_view({"patch": "partial_update"}),
-        name="update_property"
-    ),
+    path("", include(router.urls)),
+    path("offer/update-state/<int:pk>",
+         PropertyOfferUpdateStateAPIView.as_view({"patch": "partial_update"}),
+         name="update_state")
 ]
 
 # urlpatterns = [
