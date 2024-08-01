@@ -6,8 +6,8 @@ from core.serializers import AmenitySerializer, AmenityOptionListSerializer
 
 
 class AmenityListAPIView(ModelViewSet):
+    queryset = Amenity.objects.filter(is_active=True)
     serializer_class = AmenitySerializer
-    queryset = get_list_or_404(Amenity, is_active=True)
 
 
 class AmenityOptionListAPIView(ModelViewSet):
@@ -17,4 +17,3 @@ class AmenityOptionListAPIView(ModelViewSet):
     def get_queryset(self):
         amenity = get_object_or_404(Amenity, pk=self.kwargs.get("pk"))
         return amenity.options.filter(is_active=True)
-

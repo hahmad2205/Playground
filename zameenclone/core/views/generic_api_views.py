@@ -6,7 +6,7 @@ from core.serializers import AmenitySerializer, AmenityOptionListSerializer
 
 
 class AmenityListAPIView(generics.ListAPIView):
-    queryset = get_list_or_404(Amenity, is_active=True)
+    queryset = Amenity.objects.filter(is_active=True)
     serializer_class = AmenitySerializer
     pagination_class = None
 

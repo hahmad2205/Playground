@@ -17,9 +17,9 @@ class BlockedUserMiddleware:
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        response.accepted_renderer = JSONRenderer()
-        response.accepted_media_type = "application/json"
-        response.renderer_context = {}
-        response.render()
+            response.accepted_renderer = JSONRenderer()
+            response.accepted_media_type = "application/json"
+            response.renderer_context = {}
+            response.render()
 
         return response
