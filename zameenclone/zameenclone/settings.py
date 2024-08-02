@@ -28,8 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
 # Application definition
-DEAFAULT_APPS = [
+DEFAULT_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,7 +73,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
-INSTALLED_APPS = DEAFAULT_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
+INSTALLED_APPS = DEFAULT_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
