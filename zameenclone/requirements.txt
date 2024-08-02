@@ -16,3 +16,4 @@ sendgrid~=6.11.0
 python_decouple~=3.8
 django_celery_results~=2.5.1
 django_celery_beat~=2.6.0
+factory_boy~=3.3.0
