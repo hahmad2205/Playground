@@ -40,10 +40,10 @@ DEFAULT_APPS = [
 ]
 
 CUSTOM_APPS = [
-    'users.apps.UsersConfig',
-    'properties.apps.PropertiesConfig',
-    'core.apps.CoreConfig',
-    'communications.apps.CommunicationConfig'
+    'users',
+    'properties',
+    "core",
+    'communications'
 ]
 
 THIRD_PARTY_APPS = [

@@ -1,5 +1,6 @@
-from django.urls import reverse
+
 from rest_framework import status
+from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -30,7 +31,7 @@ class LoginTestCase(APITestCase):
         self.assertNotIn("access", response.data)
 
 
-class GetRefreshTokenTestCase(APITestCase):
+class RefreshTokenTestCase(APITestCase):
     def setUp(self):
         self.user = UserFactory()
         refresh = RefreshToken.for_user(self.user)
