@@ -51,7 +51,6 @@ THIRD_PARTY_APPS = [
     'django_fsm',
     'rest_framework',
     'rest_framework_simplejwt',
-    'django_crontab',
     'silk',
     'django_celery_results',
     'django_celery_beat'
