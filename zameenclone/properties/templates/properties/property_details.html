@@ -1,0 +1,61 @@
+{% extends "properties/base_listing.html" %}
+
+{% block listings %}
+<div class="d-flex justify-content-between mx-3 mt-5">
+  <div>
+    <h3>{{property.title}}</h3>
+    <h5>{{property.header}}</h5>
+  </div>
+
+  {% if not owner %}
+    <div>
+      <a href="{% url 'create_offer' property.id%}">
+        <button class="btn btn-primary">Create Offer</button>
+      </a>
+    </div>
+  {% endif %}
+</div>
+<div id="carouselExample" class="carousel slide mx-3" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for image in property.images.all %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <img src="{{ image.image_url }}" class="d-block w-100 h-75" alt="Property Image">
+      </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>
+
+<div class="mx-5">
+  <h4>Description</h4>
+  <p>{{property.description}}</p>
+  
+  <h4>Details</h4>
+  <div>
+      <div>Area = {{property.area}}</div>
+      <div>Location = {{property.location}}</div>
+      <div>purpose = {{property.purpose}}</div>
+      <div>Bath = {{property.number_of_bath}}</div>
+      <div>Bed = {{property.number_of_bed}}</div>
+      <div>Price = {{property.price}}</div>
+      <div>Contact = {{property.whatsapp_number}}</div>
+  </div>
+  
+  <h4>Amenities</h4>
+  <ul class="list-group">
+      {% for amenity in property.amenities.all %}
+          <li class="list-group-item">
+              {{amenity.amenity.amenity.name}} - {{amenity.amenity.option}} {% if amenity.value != None %}- {{amenity.value}}{% endif %}
+          </li>
+      {% endfor %}
+  </ul>
+</div>
+{% endblock listings %}
