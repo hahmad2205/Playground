@@ -20,7 +20,7 @@ class AmenityTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("name", response.data[0])
         self.assertEqual("Amenity", response.data[0]["name"].split(" ")[0])
-
+        self.assertEqual(len(response.data), 1)
 
     def test_get_no_amenity(self):
         response = self.client.get(self.base_url)
