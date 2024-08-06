@@ -28,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 DEFAULT_APPS = [
     'django.contrib.admin',
@@ -40,10 +39,10 @@ DEFAULT_APPS = [
 ]
 
 CUSTOM_APPS = [
-    'users.apps.UsersConfig',
-    'properties.apps.PropertiesConfig',
-    'core.apps.CoreConfig',
-    'communications.apps.CommunicationConfig'
+    'users',
+    'properties',
+    'core',
+    'communications'
 ]
 
 THIRD_PARTY_APPS = [
@@ -114,7 +113,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-        'Test':{
+        'Test': {
             'Name': 'test_db'
         }
     }

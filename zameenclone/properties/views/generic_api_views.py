@@ -101,7 +101,7 @@ class PropertyOfferUpdateStateAPIView(UpdateAPIView):
 
     def perform_update(self, serializer):
         instance = serializer.save()
-        send_email_on_offer_state_update.delay(instance)
+        # send_email_on_offer_state_update.delay(instance)
 
 
 class PropertyDetailAPIView(RetrieveAPIView):

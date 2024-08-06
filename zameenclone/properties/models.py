@@ -100,10 +100,10 @@ class RetrieveOffersManager(models.Manager):
 class PropertyOffers(SoftdeleteModelMixin):
     price = models.PositiveIntegerField()
     state = FSMField(default=MobileState.PENDING, protected=True, choices=MobileState.choices)
-    
+
     offered_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_offers")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="offers")
-    
+
     objects = RetrieveOffersManager()
 
     class Meta:
@@ -112,16 +112,16 @@ class PropertyOffers(SoftdeleteModelMixin):
 
     def __str__(self):
         return f"{self.property.title} - {self.price}"
-    
+
     def delete(self):
         self.is_active = False
         self.save()
-    
+
     @transition(field="state", source=MobileState.PENDING, target=MobileState.ACCEPTED)
     def mark_accepted(self):
         self.property.is_active = False
         self.property.is_sold = True
-        self.property.save(update_fields=["is_active"])
+        self.property.save(update_fields=["is_active", "is_sold"])
         self.is_active = False
         other_offers = self.__class__.objects.filter(
             property=self.property,
@@ -132,7 +132,7 @@ class PropertyOffers(SoftdeleteModelMixin):
             other_offers.update(state=MobileState.REJECTED, is_active=False)
 
         return "Offer switched to accepted!"
-    
+
     @transition(field="state", source=MobileState.PENDING, target=MobileState.REJECTED)
     def mark_rejected(self):
         self.is_active = False
