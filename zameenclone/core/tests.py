@@ -45,9 +45,10 @@ class AmenityOptionTestCase(APITestCase):
         self.user = UserFactory()
         self.client.force_authenticate(self.user)
         self.amenity = AmenityFactory()
+        self.amenity_options = AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=True)
+        self.amenity_options.extend(AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=False))
 
     def test_get_amenity_option(self):
-        AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=True)
         url = reverse("amenity_options", kwargs={"pk": self.amenity.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -80,8 +81,6 @@ class AmenityOptionTestCase(APITestCase):
 
     def test_get_active_amenity_options(self):
         url = reverse("amenity_options", kwargs={"pk": self.amenity.pk})
-        amenity_options = AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=True)
-        amenity_options.extend(AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=False))
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)
@@ -92,5 +91,4 @@ class AmenityOptionTestCase(APITestCase):
                 {'id': 2, 'amenity': {'id': 1, 'name': 'Amenity 0'}, 'option': 'Option 1'},
                 {'id': 3, 'amenity': {'id': 1, 'name': 'Amenity 0'}, 'option': 'Option 2'}
             ]
-
         )
