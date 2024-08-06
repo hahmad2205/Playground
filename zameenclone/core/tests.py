@@ -45,8 +45,8 @@ class AmenityOptionTestCase(APITestCase):
         self.user = UserFactory()
         self.client.force_authenticate(self.user)
         self.amenity = AmenityFactory()
-        self.amenity_options = AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=True)
-        self.amenity_options.extend(AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=False))
+        amenity_options = AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=True)
+        amenity_options.extend(AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=False))
 
     def test_get_amenity_option(self):
         url = reverse("amenity_options", kwargs={"pk": self.amenity.pk})
