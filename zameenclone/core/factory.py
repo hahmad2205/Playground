@@ -18,4 +18,5 @@ class AmenityOptionFactory(DjangoModelFactory):
 
     option = factory.Sequence(lambda n: f"Option {n}")
     amenity = factory.SubFactory(AmenityFactory)
+    is_active = factory.Iterator([True, False])
 

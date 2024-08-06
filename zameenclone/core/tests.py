@@ -15,17 +15,28 @@ class AmenityTestCase(APITestCase):
         self.base_url = reverse("amenities")
 
     def test_get_amenity(self):
-        self.amenity = AmenityFactory()
+        self.amenities = AmenityFactory.create_batch(3)
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("name", response.data[0])
-        self.assertEqual("Amenity", response.data[0]["name"].split(" ")[0])
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 3)
+        self.assertEqual(
+            response.data,
+            [
+                {'id': 1, 'name': 'Amenity 0'},
+                {'id': 2, 'name': 'Amenity 1'},
+                {'id': 3, 'name': 'Amenity 2'}
+            ]
+        )
 
     def test_get_no_amenity(self):
         response = self.client.get(self.base_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
+
+    def test_result_not_paginated(self):
+        response = self.client.get(self.base_url)
+        self.assertNotIn("next", response.data)
+        self.assertNotIn("count", response.data)
 
 
 class AmenityOptionTestCase(APITestCase):
@@ -34,19 +45,52 @@ class AmenityOptionTestCase(APITestCase):
         self.user = UserFactory()
         self.client.force_authenticate(self.user)
         self.amenity = AmenityFactory()
-        amenity_option = AmenityOptionFactory(amenity=self.amenity)
 
     def test_get_amenity_option(self):
+        AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=True)
         url = reverse("amenity_options", kwargs={"pk": self.amenity.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("option", response.data[0])
-        self.assertEqual("Option", response.data[0]["option"].split(" ")[0])
+        self.assertEqual(len(response.data), 3)
+        print(response.data)
+        self.assertEqual(
+            response.data,
+            [
+                {'id': 1, 'amenity': {'id': 1, 'name': 'Amenity 1'}, 'option': 'Option 6'},
+                {'id': 2, 'amenity': {'id': 1, 'name': 'Amenity 1'}, 'option': 'Option 7'},
+                {'id': 3, 'amenity': {'id': 1, 'name': 'Amenity 1'}, 'option': 'Option 8'}
+            ]
+
+        )
 
     def test_get_no_amenity_option(self):
         url = reverse("amenity_options", kwargs={"pk": 5})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        expected_error = {'detail': ErrorDetail(string='No Amenity matches the given query.', code='not_found')}
-        self.assertEqual(response.data, expected_error)
+        self.assertEqual(
+            response.data,
+            {'detail': ErrorDetail(string='No Amenity matches the given query.', code='not_found')}
+        )
 
+    def test_result_not_paginated(self):
+        url = reverse("amenity_options", kwargs={"pk": self.amenity.pk})
+        response = self.client.get(url)
+        self.assertNotIn("next", response.data)
+        self.assertNotIn("count", response.data)
+
+    def test_get_active_amenity_options(self):
+        url = reverse("amenity_options", kwargs={"pk": self.amenity.pk})
+        amenity_options = AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=True)
+        amenity_options.extend(AmenityOptionFactory.create_batch(3, amenity=self.amenity, is_active=False))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+        self.assertEqual(
+            response.data,
+            [
+                {'id': 1, 'amenity': {'id': 1, 'name': 'Amenity 0'}, 'option': 'Option 0'},
+                {'id': 2, 'amenity': {'id': 1, 'name': 'Amenity 0'}, 'option': 'Option 1'},
+                {'id': 3, 'amenity': {'id': 1, 'name': 'Amenity 0'}, 'option': 'Option 2'}
+            ]
+
+        )
