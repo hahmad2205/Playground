@@ -53,7 +53,6 @@ class AmenityOptionTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)
-        print(response.data)
         self.assertEqual(
             response.data,
             [
